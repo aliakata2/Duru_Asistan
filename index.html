@@ -319,8 +319,8 @@
       <div class="card-title">📋 Ayarlar</div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
         <label style="font-size:13px;flex:1;">Gürültü eşiği (dB)</label>
-        <input type="range" id="db-threshold-slider" min="30" max="80" value="50" style="flex:2;" oninput="updateThreshold(this.value)">
-        <span id="db-threshold-val" style="font-size:13px;font-weight:600;width:40px;">50 dB</span>
+        <input type="range" id="db-threshold-slider" min="10" max="60" value="30" style="flex:2;" oninput="updateThreshold(this.value)">
+        <span id="db-threshold-val" style="font-size:13px;font-weight:600;width:40px;">30</span>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
         <label style="font-size:13px;flex:1;">Yıldız için sessiz süre</label>
@@ -423,7 +423,7 @@ let weekOffset=0;
 // Ses ölçer state
 let audioCtx=null,analyser=null,micStream=null,rafId=null;
 let micActive=false,micPaused=false;
-let dbThreshold=50;
+let dbThreshold=30; // 0-100 skala, sessiz=0-15, konuşma=40+
 let loudTimeout=null;
 let quietSeconds=0;   // sessiz saniye
 let totalMicSeconds=0; // toplam mikrofon açık saniye
@@ -581,7 +581,11 @@ async function startMicAuto(){
     document.getElementById('mic-status-row').style.display='flex';
     document.getElementById('live-sound-panel').style.display='block';
     document.getElementById('pomo-info-card').style.display='none';
-    startQuietTimer(); drawDb(); startChartLoop();
+    showToast('🎤 Kalibrasyon yapılıyor...');
+    calibrate();
+    setTimeout(()=>{
+      startQuietTimer(); drawDb(); startChartLoop();
+    },2200);
     showToast('🎤 Ses ölçer otomatik başlatıldı');
   }catch(e){
     document.getElementById('mic-denied').style.display='flex';
@@ -634,7 +638,7 @@ function resetDay(){
 // ── Ses Ölçer ─────────────────────────────────────────
 function updateThreshold(v){
   dbThreshold=+v;
-  document.getElementById('db-threshold-val').textContent=v+' dB';
+  document.getElementById('db-threshold-val').textContent=v;
 }
 function updateStarInterval(v){
   starIntervalMin=+v;
@@ -658,8 +662,11 @@ async function toggleMic(){
     document.getElementById('mic-panel').style.display='block';
     document.getElementById('mic-denied').style.display='none';
     document.getElementById('mic-status-row').style.display='flex';
-    starSecondsLeft=starIntervalMin*60;
-    startStarTimer(); drawDb();
+    showToast('🎤 Kalibrasyon yapılıyor...');
+    calibrate();
+    setTimeout(()=>{
+      startQuietTimer(); drawDb(); startChartLoop();
+    },2200);
   }catch(e){
     document.getElementById('mic-denied').style.display='flex';
     console.error(e);
@@ -713,16 +720,51 @@ function toggleMicPause(){
   if(micPaused) resumeMic(); else pauseMic();
 }
 
-function getDb(){
+// Kalibrasyon
+let dbFloor=null; // sessizlik taban değeri
+let calibSamples=[];
+let calibDone=false;
+
+function calibrate(){
+  // 2 saniye boyunca örnek topla, ortalamasını taban al
+  calibSamples=[];
+  calibDone=false;
+  dbFloor=null;
+  const interval=setInterval(()=>{
+    if(!micActive){clearInterval(interval);return;}
+    const raw=getRawRms();
+    if(raw>0.00001) calibSamples.push(raw);
+    if(calibSamples.length>=20){
+      clearInterval(interval);
+      const avgRms=calibSamples.reduce((a,b)=>a+b,0)/calibSamples.length;
+      // Taban RMS değerini kaydet
+      dbFloor=avgRms*1.5; // biraz marj bırak
+      calibDone=true;
+      showToast('🎤 Kalibrasyon tamamlandı!');
+    }
+  },100);
+}
+
+function getRawRms(){
+  if(!analyser)return 0;
   const buf=new Uint8Array(analyser.frequencyBinCount);
   analyser.getByteTimeDomainData(buf);
   let sum=0;
   for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128;sum+=v*v;}
-  const rms=Math.sqrt(sum/buf.length);
+  return Math.sqrt(sum/buf.length);
+}
+
+function getDb(){
+  const rms=getRawRms();
   if(rms<0.00001)return 0;
-  // Gerçekçi dB aralığı: sessiz oda ~20-30dB, konuşma ~50-70dB
-  const db=20*Math.log10(rms)+94;
-  return Math.max(0,Math.min(120,db));
+  if(!calibDone||!dbFloor){
+    // Kalibrasyon yoksa ham değer göster
+    return Math.max(0,Math.min(100,20*Math.log10(rms/0.00001)));
+  }
+  // Tabandan ne kadar yüksek? 0 = sessiz, 50+ = gürültülü
+  const relative=rms/dbFloor;
+  if(relative<=1)return Math.max(0,Math.round(relative*15));
+  return Math.max(0,Math.min(100,Math.round(20*Math.log10(relative)*8)+15));
 }
 
 // Beep sesi
