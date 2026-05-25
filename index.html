@@ -430,7 +430,7 @@ let totalMicSeconds=0; // toplam mikrofon açık saniye
 let quietTimer=null;
 
 // ── Storage ───────────────────────────────────────────
-const STORE_KEY='duru_lgs_v3';
+const STORE_KEY='duru_lgs_v4';
 function loadData(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch{return {};}}
 function saveData(d){try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}catch{}}
 function pad2(n){return String(n).padStart(2,'0');}
@@ -837,8 +837,11 @@ function startChartLoop() {
 
 let currentDb=0;
 let consecutiveLoud=0;
+let dbRafRunning=false;
+
 function drawDb(){
-  if(!micActive||micPaused)return;
+  if(!micActive||micPaused){dbRafRunning=false;return;}
+  dbRafRunning=true;
   currentDb=getDb();
   pushDbHistory(currentDb);
   const pct=Math.min(100,currentDb/120*100);
@@ -857,17 +860,21 @@ function drawDb(){
   rafId=requestAnimationFrame(drawDb);
 }
 
+// Ekran açılınca RAF'ı yeniden başlat
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&micActive&&!micPaused&&!dbRafRunning){
+    drawDb();
+    startChartLoop();
+  }
+});
+
 function onLoud(db){
   consecutiveLoud++;
   if(consecutiveLoud===10){
-    starSecondsLeft=starIntervalMin*60;
-    updateStarCountdown();
-    // Ses sekmesi uyarı
     const loudEl=document.getElementById('loud-alert');
-    if(loudEl){loudEl.style.display='flex'; document.getElementById('loud-alert-text').textContent='📢 Gürültü algılandı ('+Math.round(db)+' dB)! Sayaç sıfırlandı.';}
-    // Canlı panel uyarı
+    if(loudEl){loudEl.style.display='flex'; document.getElementById('loud-alert-text').textContent='📢 Gürültü algılandı ('+Math.round(db)+' dB)!';}
     const liveLoud=document.getElementById('live-loud-alert');
-    if(liveLoud){liveLoud.style.display='flex'; document.getElementById('live-loud-text').textContent='📢 Gürültü! ('+Math.round(db)+' dB) Sayaç sıfırlandı.';}
+    if(liveLoud){liveLoud.style.display='flex'; document.getElementById('live-loud-text').textContent='📢 Gürültü! ('+Math.round(db)+' dB)';}
     clearTimeout(loudTimeout);
     loudTimeout=setTimeout(()=>{
       if(loudEl)loudEl.style.display='none';
