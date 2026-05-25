@@ -719,9 +719,31 @@ function getDb(){
   let sum=0;
   for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128;sum+=v*v;}
   const rms=Math.sqrt(sum/buf.length);
-  if(rms<0.0001)return 0;
-  return Math.max(0,Math.min(120,20*Math.log10(rms)+90));
+  if(rms<0.00001)return 0;
+  // Gerçekçi dB aralığı: sessiz oda ~20-30dB, konuşma ~50-70dB
+  const db=20*Math.log10(rms)+94;
+  return Math.max(0,Math.min(120,db));
 }
+
+// Beep sesi
+let beepCtx=null;
+function playBeep(){
+  try{
+    if(!beepCtx) beepCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const osc=beepCtx.createOscillator();
+    const gain=beepCtx.createGain();
+    osc.connect(gain); gain.connect(beepCtx.destination);
+    osc.frequency.value=880;
+    osc.type='sine';
+    gain.gain.setValueAtTime(0.3,beepCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,beepCtx.currentTime+0.4);
+    osc.start(beepCtx.currentTime);
+    osc.stop(beepCtx.currentTime+0.4);
+  }catch(e){}
+}
+
+let loudSeconds=0; // eşik üstünde geçen süre (sn)
+let beepCooldown=false;
 
 // dB Grafik state
 const DB_HISTORY_MAX = 40 * 60; // 40 dakika = 2400 saniye
@@ -891,13 +913,25 @@ function startQuietTimer(){
   clearInterval(quietTimer);
   quietSeconds=0;
   totalMicSeconds=0;
+  loudSeconds=0;
   quietTimerStartAt=Date.now();
   quietSecAtStart=0;
   totalMicSecAtStart=0;
   quietTimer=setInterval(()=>{
     if(!micActive||micPaused)return;
     totalMicSeconds++;
-    if(currentDb<=dbThreshold) quietSeconds++;
+    if(currentDb<=dbThreshold){
+      quietSeconds++;
+      loudSeconds=0; // sessizse sıfırla
+    } else {
+      loudSeconds++;
+      // 3 saniye üst üste gürültülüyse beep çal
+      if(loudSeconds>=3 && !beepCooldown){
+        playBeep();
+        beepCooldown=true;
+        setTimeout(()=>beepCooldown=false, 4000); // 4 sn bekle tekrar çalmasın
+      }
+    }
     autoSaveToday();
     updateLiveRatio();
   },1000);
