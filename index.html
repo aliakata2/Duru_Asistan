@@ -205,10 +205,10 @@
         <div style="position:relative;background:var(--bg-sec);border-radius:var(--radius-md);overflow:hidden;">
           <canvas id="db-chart" height="90" style="width:100%;display:block;"></canvas>
           <!-- Y ekseni etiketleri -->
-          <div style="position:absolute;top:6px;left:6px;font-size:10px;color:var(--text-hint);">75dB</div>
-          <div style="position:absolute;top:28px;left:6px;font-size:10px;color:var(--text-hint);">60dB</div>
-          <div id="chart-threshold-lbl" style="position:absolute;left:6px;font-size:10px;color:var(--amber);font-weight:600;">50dB</div>
-          <div style="position:absolute;bottom:18px;left:6px;font-size:10px;color:var(--text-hint);">30dB</div>
+          <div style="position:absolute;top:6px;left:6px;font-size:10px;color:var(--text-hint);">100</div>
+          <div style="position:absolute;top:28px;left:6px;font-size:10px;color:var(--text-hint);">75</div>
+          <div id="chart-threshold-lbl" style="position:absolute;left:6px;font-size:10px;color:var(--amber);font-weight:600;">eşik</div>
+          <div style="position:absolute;bottom:18px;left:6px;font-size:10px;color:var(--text-hint);">0</div>
         </div>
         <!-- X ekseni zaman etiketleri -->
         <div id="chart-x-labels" style="display:flex;justify-content:space-between;padding:0 2px;margin-top:3px;">
@@ -825,7 +825,7 @@ function drawDbChart() {
 
   // Eşik etiketi pozisyonu
   const lbl = document.getElementById('chart-threshold-lbl');
-  if (lbl) lbl.style.top = (thresholdY - 8) + 'px';
+  if (lbl) { lbl.style.top = (thresholdY - 8) + 'px'; lbl.textContent = 'eşik: '+dbThreshold; }
 
   if (dbHistory.length < 2) return;
 
@@ -881,8 +881,8 @@ function drawDbChart() {
 }
 
 function dbToY(db, H) {
-  // 20–80 dB aralığını H yüksekliğine map et
-  const minDb = 20, maxDb = 80;
+  // 0-100 skalası
+  const minDb = 0, maxDb = 100;
   return H - ((Math.min(maxDb, Math.max(minDb, db)) - minDb) / (maxDb - minDb)) * (H - 10) - 2;
 }
 function tsToX(ts, now, windowMs, W) {
