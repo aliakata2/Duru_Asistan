@@ -319,8 +319,8 @@
       <div class="card-title">📋 Ayarlar</div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
         <label style="font-size:13px;flex:1;">Gürültü eşiği (dB)</label>
-        <input type="range" id="db-threshold-slider" min="10" max="60" value="30" style="flex:2;" oninput="updateThreshold(this.value)">
-        <span id="db-threshold-val" style="font-size:13px;font-weight:600;width:40px;">30</span>
+        <input type="range" id="db-threshold-slider" min="10" max="60" value="60" style="flex:2;" oninput="updateThreshold(this.value)">
+        <span id="db-threshold-val" style="font-size:13px;font-weight:600;width:40px;">60</span>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
         <label style="font-size:13px;flex:1;">Yıldız için sessiz süre</label>
@@ -423,7 +423,7 @@ let weekOffset=0;
 // Ses ölçer state
 let audioCtx=null,analyser=null,micStream=null,rafId=null;
 let micActive=false,micPaused=false;
-let dbThreshold=30; // 0-100 skala, sessiz=0-15, konuşma=40+
+let dbThreshold=60; // 0-100 skala, sessiz=0-15, konuşma=40+
 let loudTimeout=null;
 let quietSeconds=0;   // sessiz saniye
 let totalMicSeconds=0; // toplam mikrofon açık saniye
