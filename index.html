@@ -882,20 +882,18 @@ let quietSecAtStart=0, totalMicSecAtStart=0;
 
 function startQuietTimer(){
   clearInterval(quietTimer);
+  quietSeconds=0;
+  totalMicSeconds=0;
   quietTimerStartAt=Date.now();
-  quietSecAtStart=quietSeconds;
-  totalMicSecAtStart=totalMicSeconds;
+  quietSecAtStart=0;
+  totalMicSecAtStart=0;
   quietTimer=setInterval(()=>{
     if(!micActive||micPaused)return;
-    const elapsed=Math.floor((Date.now()-quietTimerStartAt)/1000);
-    totalMicSeconds=totalMicSecAtStart+elapsed;
-    // currentDb ile sessiz saniyeyi güncelle
-    if(currentDb<=dbThreshold) quietSeconds=quietSecAtStart+elapsed;
+    totalMicSeconds++;
+    if(currentDb<=dbThreshold) quietSeconds++;
     autoSaveToday();
     updateLiveRatio();
   },1000);
-
-  // Ekran açılınca senkronize et
   document.addEventListener('visibilitychange', syncQuietTimer);
 }
 
