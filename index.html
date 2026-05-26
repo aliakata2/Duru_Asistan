@@ -347,6 +347,14 @@
                oninput="updateStarInterval(+this.value)">
       </div>
     </div>
+<!-- Alarm test -->
+<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+  <div style="font-size:13px;font-weight:600;margin-bottom:8px;">🔔 Alarm Testi</div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn" onclick="playAlarm('work')" style="flex:1;">▶ Ders Bitti Alarmı</button>
+    <button class="btn" onclick="playAlarm('break')" style="flex:1;">▶ Mola Bitti Alarmı</button>
+  </div>
+</div>
 
     <!-- Nasıl çalışır? -->
     <div class="card">
@@ -806,10 +814,11 @@ function startQuietTimer() {
     } else {
       loudSeconds++;
       if (loudSeconds >= 3 && !beepCooldown) {
-        playBeep();
-        beepCooldown = true;
-        setTimeout(() => beepCooldown = false, 4000);
-      }
+  const beepCount = loudSeconds >= 7 ? 4 : 3;
+  playBeep(beepCount);
+  beepCooldown = true;
+  setTimeout(() => beepCooldown = false, 4000);
+}
     }
     autoSaveToday();
     updateLiveRatio();
@@ -876,35 +885,62 @@ let beepCtx = null;
 function playBeep() {
   try {
     if (!beepCtx) beepCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc  = beepCtx.createOscillator();
-    const gain = beepCtx.createGain();
-    osc.connect(gain); gain.connect(beepCtx.destination);
-    osc.type = 'sine'; osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.25, beepCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, beepCtx.currentTime + 0.35);
-    osc.start(beepCtx.currentTime); osc.stop(beepCtx.currentTime + 0.4);
+    
+    // Üç kısa bip arka arkaya — daha dikkat çekici
+    const times = [0, 0.18, 0.36];
+    times.forEach(delay => {
+      const osc  = beepCtx.createOscillator();
+      const gain = beepCtx.createGain();
+      osc.connect(gain); gain.connect(beepCtx.destination);
+      osc.type = 'square'; // sine yerine square — daha keskin ve yüksek algılanan ses
+      osc.frequency.value = 880;
+      const st = beepCtx.currentTime + delay;
+      gain.gain.setValueAtTime(0.6, st);          // 0.25'ten 0.6'ya çıkardık
+      gain.gain.exponentialRampToValueAtTime(0.001, st + 0.12);
+      osc.start(st); osc.stop(st + 0.13);
+    });
   } catch(e) {}
 }
 
-// Pomodoro alarm: ders bitince yükselen arpej, mola bitince nazik iniş
+let alarmCtx = null;
+
+function stopAlarm() {
+  if (alarmCtx) { alarmCtx.close(); alarmCtx = null; }
+}
+
 function playAlarm(type) {
+  stopAlarm(); // önceki varsa durdur
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const master = ctx.createGain(); master.gain.value = 0.4; master.connect(ctx.destination);
+    alarmCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = alarmCtx.createGain();
+    master.gain.value = 0.4;
+    master.connect(alarmCtx.destination);
+
     const seq = type === 'work'
       ? [{f:523,d:0.18,t:0.0},{f:659,d:0.18,t:0.20},{f:784,d:0.18,t:0.40},{f:1047,d:0.35,t:0.60},{f:1047,d:0.35,t:1.05}]
       : [{f:784,d:0.22,t:0.0},{f:659,d:0.22,t:0.28},{f:523,d:0.40,t:0.56}];
-    seq.forEach(({f, d, t}) => {
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(master);
-      osc.type = 'sine'; osc.frequency.value = f;
-      const st = ctx.currentTime + t;
-      gain.gain.setValueAtTime(0, st);
-      gain.gain.linearRampToValueAtTime(1, st + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, st + d + 0.1);
-      osc.start(st); osc.stop(st + d + 0.15);
-    });
+
+    const seqLen = type === 'work' ? 1.6 : 1.2; // bir tekrarın süresi (sn)
+    const gap    = 0.25; // tekrarlar arası sessizlik
+
+    for (let rep = 0; rep < 20; rep++) {
+      const offset = rep * (seqLen + gap);
+      seq.forEach(({f, d, t}) => {
+        const osc  = alarmCtx.createOscillator();
+        const gain = alarmCtx.createGain();
+        osc.connect(gain); gain.connect(master);
+        osc.type = 'sine'; osc.frequency.value = f;
+        const st = alarmCtx.currentTime + offset + t;
+        gain.gain.setValueAtTime(0, st);
+        gain.gain.linearRampToValueAtTime(1, st + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, st + d + 0.1);
+        osc.start(st); osc.stop(st + d + 0.15);
+      });
+    }
+
+    // Herhangi bir yere tıklayınca durdur
+    document.addEventListener('click', stopAlarm, { once: true });
+
   } catch(e) {}
 }
 
