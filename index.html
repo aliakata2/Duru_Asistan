@@ -46,7 +46,6 @@
     .btn:hover{background:var(--bg-sec);}
     .btn.primary{background:var(--accent-dark);color:#fff;border-color:var(--accent-dark);}
     .btn.primary:hover{background:#0F6E56;}
-    .btn.danger{background:var(--red);color:#fff;border-color:var(--red);}
     .btn.big{width:100%;padding:14px;font-size:14px;font-weight:600;border-radius:var(--radius-md);margin-bottom:8px;cursor:pointer;font-family:inherit;border:none;}
     .btn.big.dalma{background:var(--amber-light);color:var(--warn-text);}
     .btn.big.odak{background:var(--accent);color:#fff;}
@@ -85,12 +84,14 @@
     .hint-box{background:var(--bg-sec);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;color:var(--text-sec);line-height:1.6;display:none;margin-top:8px;}
     .hint-box.show{display:block;}
     /* Ses ölçer */
-    .db-display{font-size:52px;font-weight:300;letter-spacing:-2px;text-align:center;margin:0.5rem 0;transition:color .3s;}
-    .db-display.ok{color:var(--accent-dark);}
-    .db-display.loud{color:var(--red);}
-    .db-bar-wrap{height:20px;background:var(--bg-sec);border-radius:99px;overflow:hidden;margin:0.75rem 0;}
-    .db-bar-fill{height:100%;border-radius:99px;transition:width .15s,background .3s;}
-    .db-threshold{font-size:12px;color:var(--text-hint);text-align:center;margin-bottom:1rem;}
+    .db-meter-wrap{position:relative;margin:1rem 0;}
+    .db-meter-track{height:28px;background:var(--bg-sec);border-radius:99px;overflow:hidden;position:relative;}
+    .db-meter-fill{height:100%;border-radius:99px;transition:width .08s linear,background .2s;}
+    .db-meter-needle{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.25);border-radius:99px;transform:translateX(-50%);transition:left .3s;}
+    .db-value{font-size:42px;font-weight:300;letter-spacing:-2px;text-align:center;font-variant-numeric:tabular-nums;transition:color .2s;}
+    .db-value.ok{color:var(--accent-dark);}
+    .db-value.loud{color:var(--red);}
+    .db-label{font-size:12px;color:var(--text-hint);text-align:center;margin-bottom:1rem;}
     .star-row{display:flex;flex-wrap:wrap;gap:6px;min-height:32px;align-items:center;}
     .star{font-size:22px;animation:starPop .35s cubic-bezier(.17,.67,.83,.67);}
     @keyframes starPop{0%{transform:scale(0) rotate(-20deg);}60%{transform:scale(1.3) rotate(5deg);}100%{transform:scale(1) rotate(0deg);}}
@@ -133,7 +134,6 @@
       <p>8. sınıf · Odaklanma & Görev Takibi</p>
     </div>
   </div>
-
   <div class="tabs">
     <button class="tab active" onclick="showTab('pomodoro',this)">⏱ Pomodoro</button>
     <button class="tab" onclick="showTab('gorevler',this)">✅ Görevler</button>
@@ -176,7 +176,7 @@
       <span>Harika! 1 tur tamamlandı. 10 dakika mola hakkın var.</span>
     </div>
 
-    <!-- Canlı Ses Paneli -->
+    <!-- Canlı Ses Paneli (Pomodoro sekmesinde) -->
     <div class="card" id="live-sound-panel" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;">
@@ -185,33 +185,33 @@
         </div>
         <button class="btn" id="live-pause-btn" onclick="toggleMicPause()" style="font-size:11px;padding:4px 12px;">⏸ Durdur</button>
       </div>
-
-      <!-- dB metre -->
+      <!-- Mini metre -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="font-size:11px;color:var(--text-hint);width:24px;text-align:right;">dB</div>
-        <div style="flex:1;height:14px;background:var(--bg-sec);border-radius:99px;overflow:hidden;position:relative;">
-          <div id="live-db-bar" style="height:100%;width:0%;border-radius:99px;background:var(--accent);transition:width .12s;"></div>
-          <div style="position:absolute;top:0;bottom:0;left:42%;width:2px;background:var(--amber);opacity:.7;"></div>
+        <span style="font-size:11px;color:var(--text-hint);width:28px;text-align:right;" id="live-db-val">--</span>
+        <div style="flex:1;height:12px;background:var(--bg-sec);border-radius:99px;overflow:hidden;position:relative;">
+          <div id="live-db-bar" style="height:100%;width:0%;border-radius:99px;background:var(--accent);transition:width .08s;"></div>
+          <!-- eşik işareti -->
+          <div id="live-threshold-tick" style="position:absolute;top:0;bottom:0;width:2px;background:var(--amber);opacity:.8;"></div>
         </div>
-        <div id="live-db-val" style="font-size:14px;font-weight:600;width:48px;text-align:right;font-variant-numeric:tabular-nums;">-- dB</div>
+        <span style="font-size:10px;color:var(--text-hint);width:28px;">dBFS</span>
       </div>
 
-      <!-- 40 DAKİKA dB AKIŞ GRAFİĞİ -->
+      <!-- 40 dk Grafik -->
       <div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <span style="font-size:11px;font-weight:600;color:var(--text-sec);letter-spacing:.5px;">40 DAKİKA dB AKIŞI</span>
-          <span style="font-size:11px;color:var(--accent);display:flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;"></span>canlı</span>
+          <span style="font-size:11px;font-weight:600;color:var(--text-sec);letter-spacing:.5px;">40 DAKİKA AKIŞI</span>
+          <span style="font-size:11px;color:var(--accent);display:flex;align-items:center;gap:4px;">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;"></span>canlı
+          </span>
         </div>
         <div style="position:relative;background:var(--bg-sec);border-radius:var(--radius-md);overflow:hidden;">
           <canvas id="db-chart" height="90" style="width:100%;display:block;"></canvas>
-          <!-- Y ekseni etiketleri -->
-          <div style="position:absolute;top:6px;left:6px;font-size:10px;color:var(--text-hint);">100</div>
-          <div style="position:absolute;top:28px;left:6px;font-size:10px;color:var(--text-hint);">75</div>
-          <div id="chart-threshold-lbl" style="position:absolute;left:6px;font-size:10px;color:var(--amber);font-weight:600;">eşik</div>
-          <div style="position:absolute;bottom:18px;left:6px;font-size:10px;color:var(--text-hint);">0</div>
+          <div id="chart-top-lbl"    style="position:absolute;top:4px;left:6px;font-size:9px;color:var(--text-hint);">0 dBFS</div>
+          <div id="chart-mid-lbl"    style="position:absolute;top:28px;left:6px;font-size:9px;color:var(--text-hint);">-40</div>
+          <div id="chart-threshold-lbl" style="position:absolute;left:6px;font-size:9px;color:var(--amber);font-weight:600;"></div>
+          <div id="chart-bot-lbl"    style="position:absolute;bottom:16px;left:6px;font-size:9px;color:var(--text-hint);">-80</div>
         </div>
-        <!-- X ekseni zaman etiketleri -->
-        <div id="chart-x-labels" style="display:flex;justify-content:space-between;padding:0 2px;margin-top:3px;">
+        <div style="display:flex;justify-content:space-between;padding:0 2px;margin-top:3px;">
           <span style="font-size:10px;color:var(--text-hint);">0dk</span>
           <span style="font-size:10px;color:var(--text-hint);">10dk</span>
           <span style="font-size:10px;color:var(--text-hint);">20dk</span>
@@ -220,7 +220,7 @@
         </div>
       </div>
 
-      <!-- Sessizlik oranı göstergesi -->
+      <!-- Sessizlik oranı -->
       <div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
           <span style="font-size:12px;color:var(--text-sec);">Sessizlik Oranı</span>
@@ -235,7 +235,7 @@
         </div>
       </div>
 
-      <!-- Sessiz süre + toplam süre -->
+      <!-- Sessiz + Toplam süre -->
       <div style="display:flex;gap:10px;margin-bottom:12px;">
         <div style="flex:1;background:var(--bg-sec);border-radius:var(--radius-md);padding:10px;text-align:center;">
           <div id="live-quiet-time" style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;">00:00</div>
@@ -246,7 +246,6 @@
           <div style="font-size:11px;color:var(--text-sec);margin-top:2px;">Toplam ölçüm</div>
         </div>
       </div>
-
       <div id="live-loud-alert" class="alert danger" style="display:none;margin-top:10px;">
         <span class="alert-icon">📢</span>
         <span id="live-loud-text">Gürültü algılandı!</span>
@@ -278,54 +277,82 @@
   <div class="section" id="tab-ses">
     <div class="card">
       <div class="card-title">🎤 Sessizlik Ölçer</div>
-      <div class="card-desc">Ders çalışırken ses seviyeni ölçür. Her 5 sessiz dakika (50 dB altında) = 1 ⭐ yıldız!</div>
-
+      <div class="card-desc">Ders çalışırken ses seviyeni ölçür. Her 5 sessiz dakika = 1 ⭐ yıldız!</div>
       <div id="mic-denied" class="alert danger" style="display:none">
         <span class="alert-icon">🚫</span>
-        <span>Mikrofon izni verilmedi. Tarayıcı adres çubuğundaki kilit simgesinden mikrofona izin ver, sayfayı yenile.</span>
+        <span>Mikrofon izni verilmedi. Tarayıcı adres çubuğundaki kilit simgesinden izin ver, sayfayı yenile.</span>
       </div>
-
       <div style="text-align:center;margin-bottom:1rem;">
         <button class="btn primary" id="mic-btn" onclick="toggleMic()" style="padding:10px 28px;font-size:14px;">🎤 Mikrofonu Başlat</button>
       </div>
-
       <div id="mic-panel" style="display:none">
-        <div class="db-display ok" id="db-display">-- dB</div>
-        <div class="db-bar-wrap">
-          <div class="db-bar-fill" id="db-bar" style="width:0%;background:var(--accent);"></div>
+        <!-- Ana metre -->
+        <div class="db-value ok" id="db-display">-- dBFS</div>
+        <div class="db-meter-wrap">
+          <div class="db-meter-track">
+            <div class="db-meter-fill" id="db-bar" style="width:0%;background:var(--accent);"></div>
+            <!-- eşik çubuğu -->
+            <div id="db-threshold-needle" class="db-meter-needle" style="left:50%;"></div>
+          </div>
         </div>
-        <div class="db-threshold">Eşik: 50 dB · Yeşil = sessiz ✓ · Kırmızı = gürültülü ✗</div>
+        <div class="db-label" id="db-label-text">Sessiz (eşik: -35 dBFS)</div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <!-- Yıldızlar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:1rem;">
           <div style="font-size:13px;font-weight:600;">Bugün kazanılan yıldızlar</div>
           <div style="font-size:13px;color:var(--text-sec);" id="star-total-label">0 ⭐</div>
         </div>
-        <div class="star-row" id="star-row"><span style="font-size:13px;color:var(--text-hint);">Henüz yıldız yok — sessiz çalışmaya devam!</span></div>
-
+        <div class="star-row" id="star-row">
+          <span style="font-size:13px;color:var(--text-hint);">Henüz yıldız yok — sessiz çalışmaya devam!</span>
+        </div>
         <div class="star-countdown" style="margin-top:12px;">
           <span style="font-size:13px;color:var(--text-sec);" id="star-timer-lbl">Sonraki ⭐ için:</span>
           <div class="star-progress-wrap"><div class="star-progress-fill" id="star-progress" style="width:0%"></div></div>
           <span style="font-size:12px;font-weight:600;color:var(--star);" id="star-timer-val">5:00</span>
         </div>
-
         <div id="loud-alert" class="alert danger" style="display:none;margin-top:1rem;">
           <span class="alert-icon">📢</span>
-          <span id="loud-alert-text">Gürültü algılandı! Sessizlik sayacı sıfırlandı.</span>
+          <span id="loud-alert-text">Gürültü algılandı!</span>
         </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">📋 Ayarlar</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-        <label style="font-size:13px;flex:1;">Gürültü eşiği (dB)</label>
-        <input type="range" id="db-threshold-slider" min="10" max="60" value="60" style="flex:2;" oninput="updateThreshold(this.value)">
-        <span id="db-threshold-val" style="font-size:13px;font-weight:600;width:40px;">60</span>
+      <!-- Eşik -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label style="font-size:13px;">Gürültü eşiği</label>
+          <span style="font-size:13px;font-weight:600;" id="db-threshold-val">-35 dBFS</span>
+        </div>
+        <!-- Görsel referans bandı -->
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-bottom:4px;">
+          <span>Hassas</span><span>Orta</span><span>Gevşek</span>
+        </div>
+        <input type="range" id="db-threshold-slider" min="-60" max="-10" value="-35"
+               style="width:100%;accent-color:var(--accent-dark);"
+               oninput="updateThreshold(+this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-top:2px;">
+          <span>-60 dBFS</span><span>fısıltı ≈ -35</span><span>-10 dBFS</span>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <label style="font-size:13px;flex:1;">Yıldız için sessiz süre</label>
-        <input type="range" id="star-interval-slider" min="1" max="10" value="5" style="flex:2;" oninput="updateStarInterval(this.value)">
-        <span id="star-interval-val" style="font-size:13px;font-weight:600;width:40px;">5 dk</span>
+      <!-- Yıldız aralığı -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label style="font-size:13px;">Yıldız için sessiz süre</label>
+          <span style="font-size:13px;font-weight:600;" id="star-interval-val">5 dk</span>
+        </div>
+        <input type="range" id="star-interval-slider" min="1" max="10" value="5"
+               style="width:100%;accent-color:var(--accent-dark);"
+               oninput="updateStarInterval(+this.value)">
+      </div>
+    </div>
+
+    <!-- Nasıl çalışır? -->
+    <div class="card">
+      <div class="card-title">ℹ️ Ölçüm hakkında</div>
+      <div class="card-desc" style="margin-bottom:0;">
+        Değerler <b>dBFS</b> (Full Scale'e göre desibel) cinsindendir. 0 dBFS mikrofon maksimumu, -80 dBFS tam sessizliktir. Sessiz bir odada mikrofon genellikle -55 ile -65 dBFS arası gösterir. Konuşma -25 ile -15 dBFS civarındadır. Eşiği kendi ortamına göre ayarla: başlat, sessizce otur, göster değeri not et, eşiği onun biraz üstüne getir.
       </div>
     </div>
   </div>
@@ -334,7 +361,7 @@
   <div class="section" id="tab-odak">
     <div class="card">
       <div class="card-title">🚫 Detayda Boğulma Butonu</div>
-      <div class="card-desc">Bir konuya takılıp kaldığında ya da "neden böyle?" diye sormaya başladığında bas.</div>
+      <div class="card-desc">Bir konuya takılıp kaldığında bas.</div>
       <button class="btn big dalma" onclick="showHint()">Detayda boğuluyorum!</button>
       <div class="hint-box" id="hint-box"></div>
     </div>
@@ -345,7 +372,7 @@
     </div>
     <div class="card">
       <div class="card-title">📖 Motivasyon</div>
-      <div class="card-desc">Yorulduğunda veya çalışmak istemediğinde bas.</div>
+      <div class="card-desc">Yorulduğunda bas.</div>
       <button class="btn big purple" onclick="showMotivation()">Motivasyon lazım!</button>
       <div class="hint-box" id="motivasyon-box"></div>
     </div>
@@ -367,13 +394,10 @@
       <div class="day-bars" id="day-bars"></div>
     </div>
     <div class="week-stats" id="week-stats"></div>
-
-    <!-- Ödül Paneli -->
     <div class="card" id="reward-card" style="margin-top:1rem;display:none">
       <div class="card-title" style="margin-bottom:4px;">🏆 Bu Haftanın Ödülü</div>
       <div id="reward-content"></div>
     </div>
-
     <div class="card" style="margin-top:1rem">
       <div class="card-title" style="margin-bottom:1rem">Derse Göre Haftalık Toplam</div>
       <div class="subject-week" id="subject-week"></div>
@@ -383,13 +407,14 @@
       <div class="history-list" id="history-list"></div>
     </div>
   </div>
-
   <div class="footer">Duru için özel yapılmıştır 💚 · LGS 2026</div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Sabitler ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+//  SABİTLER
+// ═══════════════════════════════════════════════════════
 const SUBJECTS=[
   {name:'Matematik',color:'#5DCAA5'},{name:'Türkçe',color:'#7F77DD'},
   {name:'Fen',color:'#EF9F27'},{name:'İngilizce',color:'#1D9E75'},
@@ -412,427 +437,297 @@ const motivasyonlar=[
   '🌱 Küçük adımlar büyük başarı getirir. Tek soru bile sayılır!',
 ];
 
-// ── State ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+//  GENEL STATE
+// ═══════════════════════════════════════════════════════
 let subjects=SUBJECTS.map(s=>({...s,done:0,target:TARGET}));
-let timerInterval=null,alertInterval=null;
-let timeLeft=WORK_MIN*60,totalTime=WORK_MIN*60;
-let running=false,isBreak=false,pomosDone=0;
-let dalmaCount=0,detayCount=0,motivasyonCount=0;
+let timerInterval=null, alertInterval=null;
+let timeLeft=WORK_MIN*60, totalTime=WORK_MIN*60;
+let running=false, isBreak=false, pomosDone=0;
+let dalmaCount=0, detayCount=0, motivasyonCount=0;
 let weekOffset=0;
 
-// Ses ölçer state
-let audioCtx=null,analyser=null,micStream=null,rafId=null;
-let micActive=false,micPaused=false;
-let dbThreshold=60; // 0-100 skala, sessiz=0-15, konuşma=40+
-let loudTimeout=null;
-let quietSeconds=0;   // sessiz saniye
-let totalMicSeconds=0; // toplam mikrofon açık saniye
+// Ses ölçer temel state
+let micActive=false, micPaused=false;
+let audioCtx=null, analyser=null, micStream=null;
+let rafId=null, chartAnimFrame=null;
+let dbRafRunning=false;
+let currentDb=-80;           // anlık pürüzsüzleştirilmiş dBFS değeri
+let quietSeconds=0;
+let totalMicSeconds=0;
 let quietTimer=null;
+let loudTimeout=null;
 
-// ── Storage ───────────────────────────────────────────
-const STORE_KEY='duru_lgs_v4';
-function loadData(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch{return {};}}
-function saveData(d){try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}catch{}}
-function pad2(n){return String(n).padStart(2,'0');}
-function todayKey(){const d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+// Yıldız state
+let starIntervalMin=5;
+let starSecondsLeft=5*60;
 
-function loadToday(){
-  const data=loadData(),key=todayKey();
-  if(data[key]){
-    const s=data[key];
-    subjects.forEach((sub,i)=>{sub.done=s.subjects[i]||0;});
-    pomosDone=s.pomos||0;
-    quietSeconds=s.quietSec||0;
-    totalMicSeconds=s.totalMicSec||0;
-    updateDots();
-  }
-}
-function autoSaveToday(){
-  const data=loadData(),key=todayKey();
-  const ratio=totalMicSeconds>0?Math.round(quietSeconds/totalMicSeconds*100):null;
-  data[key]={
-    date:key, subjects:subjects.map(s=>s.done),
-    pomos:pomosDone, total:subjects.reduce((a,s)=>a+s.done,0),
-    quietSec:quietSeconds, totalMicSec:totalMicSeconds,
-    quietRatio:ratio,
-  };
-  saveData(data);
-}
+// ═══════════════════════════════════════════════════════
+//  SES ÖLÇER — YENİDEN YAZILDI
+//  Gerçek dBFS ölçümü + asimetrik EMA pürüzsüzleştirme
+// ═══════════════════════════════════════════════════════
 
-// ── Tab ───────────────────────────────────────────────
-function showTab(name,el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  if(el)el.classList.add('active');
-  if(name==='istatistik')renderStats();
+// dBFS skala sınırları (görsel)
+const DB_FLOOR = -80;  // tam sessizlik alt sınırı
+const DB_CEIL  =   0;  // maksimum ses üst sınırı
+
+// Asimetrik EMA: sese hızlı tepki (0.35), sessizliğe yavaş dönüş (0.04)
+// Bu sayede kısa ses patlamalarında metre hemen yükselir,
+// sessizleştikten sonra ise yavaşça düşer — çok daha kararlı okuma.
+const ALPHA_ATTACK  = 0.35;
+const ALPHA_RELEASE = 0.04;
+
+let smoothedDb = DB_FLOOR;   // EMA değeri, DB_FLOOR'dan başlar
+let dbThreshold = -35;       // gürültü/sessiz sınırı (dBFS), kullanıcı değiştirebilir
+
+// Ham RMS hesabı — Float32 ile tam hassasiyet, fftSize kadar örnek
+function computeRawDbFS() {
+  if (!analyser) return DB_FLOOR;
+  const buf = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  let sum = 0;
+  for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+  const rms = Math.sqrt(sum / buf.length);
+  if (rms < 1e-7) return DB_FLOOR;                          // neredeyse sıfır → taban
+  return Math.max(DB_FLOOR, Math.min(DB_CEIL, 20 * Math.log10(rms)));
 }
 
-// ── Toast ─────────────────────────────────────────────
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3500);
+// Pürüzsüzleştirilmiş dBFS — her animasyon karesinde çağrılır
+function getSmoothedDb() {
+  const raw = computeRawDbFS();
+  // Ses yükseldiyse hızlı al, düştüyse yavaş bırak
+  const alpha = raw > smoothedDb ? ALPHA_ATTACK : ALPHA_RELEASE;
+  smoothedDb = alpha * raw + (1 - alpha) * smoothedDb;
+  return smoothedDb;
 }
 
-// ── Timer ─────────────────────────────────────────────
-function pad(n){return String(n).padStart(2,'0');}
-function setMode(mode){
-  clearInterval(timerInterval);clearInterval(alertInterval);
-  running=false;
-  document.getElementById('start-btn').textContent='▶ Başlat';
-  document.getElementById('mode-work').classList.toggle('active',mode==='work');
-  document.getElementById('mode-break').classList.toggle('active',mode==='break');
-  if(mode==='work'){
-    isBreak=false;timeLeft=WORK_MIN*60;totalTime=WORK_MIN*60;
-    document.getElementById('timer-sub').textContent='Çalışma süresi · 4 tur hedefi';
-  }else{
-    isBreak=true;timeLeft=BREAK_MIN*60;totalTime=BREAK_MIN*60;
-    document.getElementById('timer-sub').textContent='Mola · Dinlen!';
-    // Molaya geçince sesi duraklat
-    if(micActive&&!micPaused) pauseMic();
-  }
-  updateTimerDisplay();
-}
-function updateTimerDisplay(){
-  document.getElementById('timer-display').textContent=pad(Math.floor(timeLeft/60))+':'+pad(timeLeft%60);
-  document.getElementById('timer-progress').style.width=(timeLeft/totalTime*100)+'%';
+// dBFS → görsel bar yüzdesi (0–100)
+function dbToPercent(db) {
+  return Math.max(0, Math.min(100,
+    ((db - DB_FLOOR) / (DB_CEIL - DB_FLOOR)) * 100
+  ));
 }
 
-let timerStartedAt=null; // sayaç başlatıldığındaki timestamp
-let timeLeftAtStart=0;   // başlatıldığındaki kalan süre
-
-function tick(){
-  if(!running)return;
-  // Gerçek zamana göre hesapla
-  const elapsed=Math.floor((Date.now()-timerStartedAt)/1000);
-  timeLeft=Math.max(0,timeLeftAtStart-elapsed);
-  updateTimerDisplay();
-  if(timeLeft<=0){
-    clearInterval(timerInterval);clearInterval(alertInterval);
-    running=false;document.getElementById('start-btn').textContent='▶ Başlat';
-    if(!isBreak){
-      pomosDone=Math.min(4,pomosDone+1);updateDots();autoSaveToday();
-      document.getElementById('break-alert').style.display='flex';
-      setTimeout(()=>document.getElementById('break-alert').style.display='none',6000);
-      showToast('🎉 30 dakika tamamlandı! Mola zamanı.');
-      setMode('break');
-    }else{showToast('📚 Mola bitti! Çalışmaya devam.');setMode('work');}
-    return;
-  }
+// dBFS → canvas Y koordinatı
+function dbToY(db, H) {
+  const pct = (Math.max(DB_FLOOR, Math.min(DB_CEIL, db)) - DB_FLOOR) / (DB_CEIL - DB_FLOOR);
+  return H - pct * (H - 12) - 4;
 }
 
-function startAlertInterval(){
-  alertInterval=setInterval(()=>{
-    dalmaCount++;
-    document.getElementById('dalma-count').textContent=dalmaCount;
-    document.getElementById('focus-alert').style.display='flex';
-    showToast('🔔 Duru, neredesin? Odaklan!');
-    setTimeout(()=>document.getElementById('focus-alert').style.display='none',5000);
-  },ALERT_MIN*60*1000);
+// Eşik iğnesini hem ana sekmede hem Pomodoro panelinde güncelle
+function updateThresholdUI() {
+  const pct = dbToPercent(dbThreshold);
+  // Ana sekme iğnesi
+  const needle = document.getElementById('db-threshold-needle');
+  if (needle) needle.style.left = pct + '%';
+  // Canlı panel iğnesi
+  const liveTick = document.getElementById('live-threshold-tick');
+  if (liveTick) liveTick.style.left = pct + '%';
+  // Etiketler
+  document.getElementById('db-threshold-val').textContent = dbThreshold + ' dBFS';
+  const lbl = document.getElementById('db-label-text');
+  if (lbl) lbl.textContent = (currentDb <= dbThreshold ? 'Sessiz' : 'Gürültülü') + ' (eşik: ' + dbThreshold + ' dBFS)';
 }
-
-function toggleTimer(){
-  if(running){
-    clearInterval(timerInterval);clearInterval(alertInterval);
-    running=false;
-    // Duraklatıldığındaki kalan süreyi kaydet
-    timeLeft=Math.max(0,timeLeftAtStart-Math.floor((Date.now()-timerStartedAt)/1000));
-    document.getElementById('start-btn').textContent='▶ Devam';
-    updateTimerDisplay();
-    if(micActive&&!micPaused) pauseMic();
-  }else{
-    timerStartedAt=Date.now();
-    timeLeftAtStart=timeLeft;
-    timerInterval=setInterval(tick,500); // 500ms'de bir kontrol et
-    startAlertInterval();
-    running=true;document.getElementById('start-btn').textContent='⏸ Durdur';
-    if(!isBreak) startMicAuto();
-  }
+function updateThreshold(v) {
+  dbThreshold = v;
+  updateThresholdUI();
 }
-
-// Sekme/ekran görünürlüğü değişince sayacı senkronize et
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&running){
-    // Ekran açılınca hemen güncelle
-    const elapsed=Math.floor((Date.now()-timerStartedAt)/1000);
-    timeLeft=Math.max(0,timeLeftAtStart-elapsed);
-    updateTimerDisplay();
-    if(timeLeft<=0) tick(); // süre dolduysa işle
-  }
-});
-async function startMicAuto(){
-  if(micActive){
-    if(micPaused) resumeMic();
-    return;
-  }
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-    micStream=stream;
-    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    analyser=audioCtx.createAnalyser();
-    analyser.fftSize=2048;
-    const src=audioCtx.createMediaStreamSource(stream);
-    src.connect(analyser);
-    micActive=true; micPaused=false;
-    document.getElementById('mic-btn').textContent='⏹ Durdur';
-    document.getElementById('mic-panel').style.display='block';
-    document.getElementById('mic-denied').style.display='none';
-    document.getElementById('mic-status-row').style.display='flex';
-    document.getElementById('live-sound-panel').style.display='block';
-    document.getElementById('pomo-info-card').style.display='none';
-    showToast('🎤 Kalibrasyon yapılıyor...');
-    calibrate();
-    setTimeout(()=>{
-      startQuietTimer(); drawDb(); startChartLoop();
-    },2200);
-    showToast('🎤 Ses ölçer otomatik başlatıldı');
-  }catch(e){
-    document.getElementById('mic-denied').style.display='flex';
-  }
-}
-function resetTimer(){setMode(isBreak?'break':'work');}
-function updateDots(){document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('done',i<pomosDone));}
-
-// ── Görevler ──────────────────────────────────────────
-function renderSubjects(){
-  const grid=document.getElementById('subject-grid');
-  grid.innerHTML='';let totalDone=0;
-  subjects.forEach((s,i)=>{
-    totalDone+=s.done;
-    const pct=Math.min(100,Math.round(s.done/s.target*100));
-    const isDone=s.done>=s.target;
-    const card=document.createElement('div');
-    card.className='subject-card';
-    card.innerHTML=`
-      <div class="subject-header">
-        <span class="subject-name">${s.name}</span>
-        <span class="subject-badge ${isDone?'done':''}">${isDone?'✓ Tamam':s.done+'/'+s.target}</span>
-      </div>
-      <div class="subject-pct">${pct}% tamamlandı</div>
-      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${s.color}"></div></div>
-      <div class="q-btns">
-        <button onclick="addQ(${i},-5)">-5</button>
-        <button onclick="addQ(${i},-1)">-1</button>
-        <button class="plus" onclick="addQ(${i},1)">+1</button>
-        <button class="plus" onclick="addQ(${i},5)">+5</button>
-      </div>`;
-    grid.appendChild(card);
-  });
-  document.getElementById('total-done').textContent=totalDone;
-  document.getElementById('total-pct').textContent='%'+Math.round(totalDone/(TARGET*SUBJECTS.length)*100);
-  autoSaveToday();
-}
-function addQ(i,n){
-  subjects[i].done=Math.max(0,subjects[i].done+n);
-  if(subjects[i].done>=subjects[i].target)showToast('🎉 '+subjects[i].name+' hedefine ulaştın!');
-  renderSubjects();
-}
-function saveDay(){autoSaveToday();showToast('💾 Bugünün çalışması kaydedildi!');}
-function resetDay(){
-  if(!confirm('Günü sıfırlamak istediğinden emin misin?'))return;
-  subjects.forEach(s=>s.done=0);pomosDone=0;updateDots();renderSubjects();
-  showToast('🔄 Yeni gün başladı! Hadi başla!');
-}
-
-// ── Ses Ölçer ─────────────────────────────────────────
-function updateThreshold(v){
-  dbThreshold=+v;
-  document.getElementById('db-threshold-val').textContent=v;
-}
-function updateStarInterval(v){
-  starIntervalMin=+v;
-  document.getElementById('star-interval-val').textContent=v+' dk';
-  starSecondsLeft=starIntervalMin*60;
+function updateStarInterval(v) {
+  starIntervalMin = v;
+  document.getElementById('star-interval-val').textContent = v + ' dk';
+  starSecondsLeft = starIntervalMin * 60;
   updateStarCountdown();
 }
 
-async function toggleMic(){
-  if(micActive){stopMic();return;}
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-    micStream=stream;
-    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    analyser=audioCtx.createAnalyser();
-    analyser.fftSize=2048;
-    const src=audioCtx.createMediaStreamSource(stream);
-    src.connect(analyser);
-    micActive=true; micPaused=false;
-    document.getElementById('mic-btn').textContent='⏹ Durdur';
-    document.getElementById('mic-panel').style.display='block';
-    document.getElementById('mic-denied').style.display='none';
-    document.getElementById('mic-status-row').style.display='flex';
-    showToast('🎤 Kalibrasyon yapılıyor...');
-    calibrate();
-    setTimeout(()=>{
-      startQuietTimer(); drawDb(); startChartLoop();
-    },2200);
-  }catch(e){
-    document.getElementById('mic-denied').style.display='flex';
-    console.error(e);
+// ─── Mikrofon başlatma / durdurma ──────────────────────
+function initMic(stream) {
+  micStream = stream;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;          // 2048 örnek — yeterli çözünürlük
+  analyser.smoothingTimeConstant = 0; // EMA'yı biz yapıyoruz, Web Audio'nun kendi smoothing'ini kapat
+  const src = audioCtx.createMediaStreamSource(stream);
+  src.connect(analyser);
+  smoothedDb = DB_FLOOR;             // metre sıfırdan başlasın
+  micActive = true; micPaused = false;
+  document.getElementById('mic-btn').textContent = '⏹ Durdur';
+  document.getElementById('mic-panel').style.display = 'block';
+  document.getElementById('mic-denied').style.display = 'none';
+  document.getElementById('mic-status-row').style.display = 'flex';
+  document.getElementById('live-sound-panel').style.display = 'block';
+  document.getElementById('pomo-info-card').style.display = 'none';
+  updateThresholdUI();
+}
+
+async function toggleMic() {
+  if (micActive) { stopMic(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
+    initMic(stream);
+    startQuietTimer();
+    drawDb();
+    startChartLoop();
+    showToast('🎤 Ses ölçer başlatıldı');
+  } catch(e) {
+    document.getElementById('mic-denied').style.display = 'flex';
   }
 }
-function stopMic(){
-  micActive=false; micPaused=false;
-  if(micStream)micStream.getTracks().forEach(t=>t.stop());
-  if(audioCtx)audioCtx.close();
-  if(rafId)cancelAnimationFrame(rafId);
-  if(chartAnimFrame)cancelAnimationFrame(chartAnimFrame);
-  clearInterval(starInterval); clearInterval(quietTimer);
-  dbHistory=[];
-  document.getElementById('mic-btn').textContent='🎤 Mikrofonu Başlat';
-  document.getElementById('mic-panel').style.display='none';
-  document.getElementById('mic-status-row').style.display='none';
-  document.getElementById('live-sound-panel').style.display='none';
-  document.getElementById('pomo-info-card').style.display='block';
+async function startMicAuto() {
+  if (micActive) { if (micPaused) resumeMic(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
+    initMic(stream);
+    startQuietTimer();
+    drawDb();
+    startChartLoop();
+    showToast('🎤 Ses ölçer otomatik başlatıldı');
+  } catch(e) {
+    document.getElementById('mic-denied').style.display = 'flex';
+  }
 }
-function pauseMic(){
-  if(!micActive||micPaused)return;
-  micPaused=true;
-  if(rafId)cancelAnimationFrame(rafId);
-  if(chartAnimFrame)cancelAnimationFrame(chartAnimFrame);
-  clearInterval(starInterval); clearInterval(quietTimer);
-  // canlı panel → sarı
-  document.getElementById('live-dot').style.background='var(--amber)';
-  document.getElementById('live-dot').style.animation='none';
-  document.getElementById('live-pause-btn').textContent='▶ Devam Et';
-  // timer kartı
-  document.getElementById('mic-pause-btn').textContent='▶ Devam Et';
-  document.getElementById('mic-status-lbl').textContent='Ses ölçer duraklatıldı';
-  document.getElementById('mic-status-dot').style.background='var(--amber)';
-  document.getElementById('mic-status-dot').style.animation='none';
+function stopMic() {
+  micActive = false; micPaused = false; dbRafRunning = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
+  clearInterval(quietTimer);
+  if (micStream) micStream.getTracks().forEach(t => t.stop());
+  if (audioCtx) audioCtx.close();
+  dbHistory = [];
+  document.getElementById('mic-btn').textContent = '🎤 Mikrofonu Başlat';
+  document.getElementById('mic-panel').style.display = 'none';
+  document.getElementById('mic-status-row').style.display = 'none';
+  document.getElementById('live-sound-panel').style.display = 'none';
+  document.getElementById('pomo-info-card').style.display = 'block';
+  document.removeEventListener('visibilitychange', syncQuietTimer);
+}
+function pauseMic() {
+  if (!micActive || micPaused) return;
+  micPaused = true; dbRafRunning = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
+  clearInterval(quietTimer);
+  document.getElementById('live-dot').style.cssText = 'width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0;';
+  document.getElementById('live-pause-btn').textContent = '▶ Devam Et';
+  document.getElementById('mic-pause-btn').textContent = '▶ Devam Et';
+  document.getElementById('mic-status-lbl').textContent = 'Ses ölçer duraklatıldı';
+  document.getElementById('mic-status-dot').style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;';
   showToast('⏸ Ses ölçer duraklatıldı');
 }
-function resumeMic(){
-  if(!micActive||!micPaused)return;
-  micPaused=false;
-  document.getElementById('live-dot').style.background='var(--accent)';
-  document.getElementById('live-dot').style.animation='pulse 1.5s infinite';
-  document.getElementById('live-pause-btn').textContent='⏸ Durdur';
-  document.getElementById('mic-pause-btn').textContent='⏸ Geçici Durdur';
-  document.getElementById('mic-status-lbl').textContent='Ses ölçer aktif';
-  document.getElementById('mic-status-dot').style.background='var(--accent)';
-  document.getElementById('mic-status-dot').style.animation='pulse 1.5s infinite';
-  startQuietTimer(); drawDb(); startChartLoop();
+function resumeMic() {
+  if (!micActive || !micPaused) return;
+  micPaused = false;
+  document.getElementById('live-dot').style.cssText = 'width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;flex-shrink:0;';
+  document.getElementById('live-pause-btn').textContent = '⏸ Durdur';
+  document.getElementById('mic-pause-btn').textContent = '⏸ Geçici Durdur';
+  document.getElementById('mic-status-lbl').textContent = 'Ses ölçer aktif';
+  document.getElementById('mic-status-dot').style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;';
+  startQuietTimer();
+  drawDb();
+  startChartLoop();
   showToast('▶ Ses ölçer devam ediyor');
 }
-function toggleMicPause(){
-  if(micPaused) resumeMic(); else pauseMic();
+function toggleMicPause() { if (micPaused) resumeMic(); else pauseMic(); }
+
+// ─── Animasyon döngüsü: dB metreyi güncelle ────────────
+function drawDb() {
+  if (!micActive || micPaused) { dbRafRunning = false; return; }
+  dbRafRunning = true;
+  currentDb = getSmoothedDb();
+  pushDbHistory(currentDb);
+
+  const pct     = dbToPercent(currentDb);
+  const isLoud  = currentDb > dbThreshold;
+  const color   = isLoud ? 'var(--red)' : 'var(--accent)';
+  const dbText  = Math.round(currentDb) + ' dBFS';
+
+  // Ana sekme
+  const display = document.getElementById('db-display');
+  const bar     = document.getElementById('db-bar');
+  if (display) { display.textContent = dbText; display.className = 'db-value ' + (isLoud ? 'loud' : 'ok'); }
+  if (bar)     { bar.style.width = pct + '%'; bar.style.background = color; }
+  const lbl = document.getElementById('db-label-text');
+  if (lbl) lbl.textContent = (isLoud ? 'Gürültülü' : 'Sessiz') + ' (eşik: ' + dbThreshold + ' dBFS)';
+
+  // Canlı panel
+  const liveBar = document.getElementById('live-db-bar');
+  const liveVal = document.getElementById('live-db-val');
+  if (liveBar) { liveBar.style.width = pct + '%'; liveBar.style.background = color; }
+  if (liveVal) { liveVal.textContent = Math.round(currentDb); liveVal.style.color = color; }
+
+  if (isLoud) onLoud(); else onQuietFrame();
+  rafId = requestAnimationFrame(drawDb);
 }
 
-// Kalibrasyon
-let dbFloor=null; // sessizlik taban değeri
-let calibSamples=[];
-let calibDone=false;
-
-function calibrate(){
-  // 2 saniye boyunca örnek topla, ortalamasını taban al
-  calibSamples=[];
-  calibDone=false;
-  dbFloor=null;
-  const interval=setInterval(()=>{
-    if(!micActive){clearInterval(interval);return;}
-    const raw=getRawRms();
-    if(raw>0.00001) calibSamples.push(raw);
-    if(calibSamples.length>=20){
-      clearInterval(interval);
-      const avgRms=calibSamples.reduce((a,b)=>a+b,0)/calibSamples.length;
-      // Taban RMS değerini kaydet
-      dbFloor=avgRms*1.5; // biraz marj bırak
-      calibDone=true;
-      showToast('🎤 Kalibrasyon tamamlandı!');
-    }
-  },100);
-}
-
-function getRawRms(){
-  if(!analyser)return 0;
-  const buf=new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteTimeDomainData(buf);
-  let sum=0;
-  for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128;sum+=v*v;}
-  return Math.sqrt(sum/buf.length);
-}
-
-function getDb(){
-  const rms=getRawRms();
-  if(rms<0.00001)return 0;
-  if(!calibDone||!dbFloor){
-    // Kalibrasyon yoksa ham değer göster
-    return Math.max(0,Math.min(100,20*Math.log10(rms/0.00001)));
+let consecutiveLoudFrames = 0;
+function onLoud() {
+  consecutiveLoudFrames++;
+  if (consecutiveLoudFrames === 15) { // ~0.25 saniye sürekli gürültü
+    const loudEl   = document.getElementById('loud-alert');
+    const liveLoud = document.getElementById('live-loud-alert');
+    if (loudEl)   { loudEl.style.display = 'flex';   document.getElementById('loud-alert-text').textContent = '📢 Gürültü algılandı (' + Math.round(currentDb) + ' dBFS)!'; }
+    if (liveLoud) { liveLoud.style.display = 'flex'; document.getElementById('live-loud-text').textContent  = '📢 Gürültü (' + Math.round(currentDb) + ' dBFS)'; }
+    clearTimeout(loudTimeout);
+    loudTimeout = setTimeout(() => {
+      if (loudEl)   loudEl.style.display   = 'none';
+      if (liveLoud) liveLoud.style.display = 'none';
+    }, 3500);
   }
-  // Tabandan ne kadar yüksek? 0 = sessiz, 50+ = gürültülü
-  const relative=rms/dbFloor;
-  if(relative<=1)return Math.max(0,Math.round(relative*15));
-  return Math.max(0,Math.min(100,Math.round(20*Math.log10(relative)*8)+15));
 }
+function onQuietFrame() { consecutiveLoudFrames = 0; }
 
-// Beep sesi
-let beepCtx=null;
-function playBeep(){
-  try{
-    if(!beepCtx) beepCtx=new(window.AudioContext||window.webkitAudioContext)();
-    const osc=beepCtx.createOscillator();
-    const gain=beepCtx.createGain();
-    osc.connect(gain); gain.connect(beepCtx.destination);
-    osc.frequency.value=880;
-    osc.type='sine';
-    gain.gain.setValueAtTime(0.3,beepCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001,beepCtx.currentTime+0.4);
-    osc.start(beepCtx.currentTime);
-    osc.stop(beepCtx.currentTime+0.4);
-  }catch(e){}
-}
+// Ekran açılınca RAF'ı yeniden başlat
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && micActive && !micPaused && !dbRafRunning) {
+    drawDb();
+    startChartLoop();
+  }
+  if (document.visibilityState === 'visible' && running) {
+    const elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+    timeLeft = Math.max(0, timeLeftAtStart - elapsed);
+    updateTimerDisplay();
+    if (timeLeft <= 0) tick();
+  }
+});
 
-let loudSeconds=0; // eşik üstünde geçen süre (sn)
-let beepCooldown=false;
-
-// dB Grafik state
-const DB_HISTORY_MAX = 40 * 60; // 40 dakika = 2400 saniye
-let dbHistory = []; // {db, ts} listesi
-let chartAnimFrame = null;
-
+// ─── 40 dk Grafik ──────────────────────────────────────
+const DB_HISTORY_MAX = 40 * 60; // saniye
+let dbHistory = [];
 function pushDbHistory(db) {
   const now = Date.now();
-  dbHistory.push({ db, ts: now });
-  // 40 dakikadan eski verileri sil
+  dbHistory.push({db, ts: now});
   const cutoff = now - DB_HISTORY_MAX * 1000;
   while (dbHistory.length > 0 && dbHistory[0].ts < cutoff) dbHistory.shift();
 }
-
+function tsToX(ts, now, windowMs, W) {
+  return ((ts - (now - windowMs)) / windowMs) * W;
+}
 function drawDbChart() {
   const canvas = document.getElementById('db-chart');
   if (!canvas) return;
   const dpr = window.devicePixelRatio || 1;
-  const W = canvas.offsetWidth;
-  const H = 90;
+  const W   = canvas.offsetWidth;
+  const H   = 90;
   if (canvas.width !== W * dpr) { canvas.width = W * dpr; canvas.height = H * dpr; }
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  // Arka plan
-  const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
   ctx.clearRect(0, 0, W, H);
 
-  // Eşik çizgisi (kesikli turuncu)
-  const thresholdY = dbToY(dbThreshold, H);
+  // Eşik çizgisi
+  const tY = dbToY(dbThreshold, H);
   ctx.setLineDash([4, 4]);
   ctx.strokeStyle = '#EF9F27';
   ctx.lineWidth = 1.5;
-  ctx.globalAlpha = 0.7;
-  ctx.beginPath(); ctx.moveTo(0, thresholdY); ctx.lineTo(W, thresholdY); ctx.stroke();
+  ctx.globalAlpha = 0.75;
+  ctx.beginPath(); ctx.moveTo(0, tY); ctx.lineTo(W, tY); ctx.stroke();
   ctx.setLineDash([]); ctx.globalAlpha = 1;
-
-  // Eşik etiketi pozisyonu
-  const lbl = document.getElementById('chart-threshold-lbl');
-  if (lbl) { lbl.style.top = (thresholdY - 8) + 'px'; lbl.textContent = 'eşik: '+dbThreshold; }
+  const tlbl = document.getElementById('chart-threshold-lbl');
+  if (tlbl) { tlbl.style.top = Math.max(4, tY - 10) + 'px'; tlbl.textContent = dbThreshold + ' dBFS'; }
 
   if (dbHistory.length < 2) return;
-
   const now = Date.now();
   const windowMs = DB_HISTORY_MAX * 1000;
 
-  // Alan dolgusu — önce path çiz
+  // Dolgu alanı
   ctx.beginPath();
   let started = false;
   for (let i = 0; i < dbHistory.length; i++) {
@@ -844,51 +739,33 @@ function drawDbChart() {
   const lastX = tsToX(dbHistory[dbHistory.length - 1].ts, now, windowMs, W);
   ctx.lineTo(lastX, H);
   ctx.closePath();
-
-  // Gradient dolgu — yeşil alt, kırmızı üst
   const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, 'rgba(226,75,74,0.55)');
-  grad.addColorStop(0.5, 'rgba(239,159,39,0.35)');
-  grad.addColorStop(1, 'rgba(93,202,165,0.25)');
+  grad.addColorStop(0,   'rgba(226,75,74,0.50)');
+  grad.addColorStop(0.5, 'rgba(239,159,39,0.30)');
+  grad.addColorStop(1,   'rgba(93,202,165,0.20)');
   ctx.fillStyle = grad;
   ctx.fill();
 
-  // Çizgi — renk segmentli
+  // Renk segmentli çizgi
   for (let i = 1; i < dbHistory.length; i++) {
     const x0 = tsToX(dbHistory[i-1].ts, now, windowMs, W);
     const y0 = dbToY(dbHistory[i-1].db, H);
     const x1 = tsToX(dbHistory[i].ts, now, windowMs, W);
     const y1 = dbToY(dbHistory[i].db, H);
-    ctx.beginPath();
-    ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
-    const avgDb = (dbHistory[i-1].db + dbHistory[i].db) / 2;
-    ctx.strokeStyle = avgDb > dbThreshold ? '#E24B4A' : '#5DCAA5';
-    ctx.lineWidth = 1.5;
-    ctx.globalAlpha = 0.9;
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+    ctx.strokeStyle = ((dbHistory[i-1].db + dbHistory[i].db) / 2 > dbThreshold) ? '#E24B4A' : '#5DCAA5';
+    ctx.lineWidth = 1.5; ctx.globalAlpha = 0.9; ctx.stroke();
   }
   ctx.globalAlpha = 1;
 
   // Canlı nokta
-  if (dbHistory.length > 0) {
-    const lx = tsToX(dbHistory[dbHistory.length-1].ts, now, windowMs, W);
-    const ly = dbToY(dbHistory[dbHistory.length-1].db, H);
-    ctx.beginPath();
-    ctx.arc(lx, ly, 3, 0, Math.PI*2);
-    ctx.fillStyle = dbHistory[dbHistory.length-1].db > dbThreshold ? '#E24B4A' : '#1D9E75';
-    ctx.fill();
-  }
+  const last = dbHistory[dbHistory.length - 1];
+  const lx = tsToX(last.ts, now, windowMs, W);
+  const ly = dbToY(last.db, H);
+  ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+  ctx.fillStyle = last.db > dbThreshold ? '#E24B4A' : '#1D9E75';
+  ctx.fill();
 }
-
-function dbToY(db, H) {
-  // 0-100 skalası
-  const minDb = 0, maxDb = 100;
-  return H - ((Math.min(maxDb, Math.max(minDb, db)) - minDb) / (maxDb - minDb)) * (H - 10) - 2;
-}
-function tsToX(ts, now, windowMs, W) {
-  return ((ts - (now - windowMs)) / windowMs) * W;
-}
-
 function startChartLoop() {
   if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
   function loop() {
@@ -899,292 +776,467 @@ function startChartLoop() {
   loop();
 }
 
-let currentDb=0;
-let consecutiveLoud=0;
-let dbRafRunning=false;
+// ─── Sessizlik sayacı ───────────────────────────────────
+let loudSeconds = 0;
+let beepCooldown = false;
+let quietTimerStartAt = null;
+let quietSecAtStart = 0, totalMicSecAtStart = 0;
 
-function drawDb(){
-  if(!micActive||micPaused){dbRafRunning=false;return;}
-  dbRafRunning=true;
-  currentDb=getDb();
-  pushDbHistory(currentDb);
-  const pct=Math.min(100,currentDb/120*100);
-  const isLoud=currentDb>dbThreshold;
-  // Ses sekmesi
-  const display=document.getElementById('db-display');
-  const bar=document.getElementById('db-bar');
-  if(display){display.textContent=Math.round(currentDb)+' dB'; display.className='db-display '+(isLoud?'loud':'ok');}
-  if(bar){bar.style.width=pct+'%'; bar.style.background=isLoud?'var(--red)':'var(--accent)';}
-  // Canlı panel
-  const liveBar=document.getElementById('live-db-bar');
-  const liveVal=document.getElementById('live-db-val');
-  if(liveBar){liveBar.style.width=pct+'%'; liveBar.style.background=isLoud?'var(--red)':'var(--accent)';}
-  if(liveVal){liveVal.textContent=Math.round(currentDb)+' dB'; liveVal.style.color=isLoud?'var(--red)':'var(--accent-dark)';}
-  if(isLoud) onLoud(currentDb); else consecutiveLoud=0;
-  rafId=requestAnimationFrame(drawDb);
-}
-
-// Ekran açılınca RAF'ı yeniden başlat
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&micActive&&!micPaused&&!dbRafRunning){
-    drawDb();
-    startChartLoop();
-  }
-});
-
-function onLoud(db){
-  consecutiveLoud++;
-  if(consecutiveLoud===10){
-    const loudEl=document.getElementById('loud-alert');
-    if(loudEl){loudEl.style.display='flex'; document.getElementById('loud-alert-text').textContent='📢 Gürültü algılandı ('+Math.round(db)+' dB)!';}
-    const liveLoud=document.getElementById('live-loud-alert');
-    if(liveLoud){liveLoud.style.display='flex'; document.getElementById('live-loud-text').textContent='📢 Gürültü! ('+Math.round(db)+' dB)';}
-    clearTimeout(loudTimeout);
-    loudTimeout=setTimeout(()=>{
-      if(loudEl)loudEl.style.display='none';
-      if(liveLoud)liveLoud.style.display='none';
-    },4000);
-  }
-}
-
-// Sessizlik oranı sayacı
-let quietTimerStartAt=null;
-let quietSecAtStart=0, totalMicSecAtStart=0;
-
-function startQuietTimer(){
+function startQuietTimer() {
   clearInterval(quietTimer);
-  quietSeconds=0;
-  totalMicSeconds=0;
-  loudSeconds=0;
-  quietTimerStartAt=Date.now();
-  quietSecAtStart=0;
-  totalMicSecAtStart=0;
-  quietTimer=setInterval(()=>{
-    if(!micActive||micPaused)return;
+  // quietSeconds / totalMicSeconds SIFIRLANMAZ — storage'dan gelen birikim korunur
+  loudSeconds = 0;
+  starSecondsLeft = starIntervalMin * 60;
+  quietTimerStartAt = Date.now();
+  quietSecAtStart = quietSeconds;
+  totalMicSecAtStart = totalMicSeconds;
+
+  quietTimer = setInterval(() => {
+    if (!micActive || micPaused) return;
     totalMicSeconds++;
-    if(currentDb<=dbThreshold){
+    if (currentDb <= dbThreshold) {
       quietSeconds++;
-      loudSeconds=0; // sessizse sıfırla
+      loudSeconds = 0;
+      starSecondsLeft--;
+      if (starSecondsLeft <= 0) {
+        awardStar();
+        starSecondsLeft = starIntervalMin * 60;
+      }
+      updateStarCountdown();
     } else {
       loudSeconds++;
-      // 3 saniye üst üste gürültülüyse beep çal
-      if(loudSeconds>=3 && !beepCooldown){
+      if (loudSeconds >= 3 && !beepCooldown) {
         playBeep();
-        beepCooldown=true;
-        setTimeout(()=>beepCooldown=false, 4000); // 4 sn bekle tekrar çalmasın
+        beepCooldown = true;
+        setTimeout(() => beepCooldown = false, 4000);
       }
     }
     autoSaveToday();
     updateLiveRatio();
-  },1000);
+  }, 1000);
+
+  document.removeEventListener('visibilitychange', syncQuietTimer);
   document.addEventListener('visibilitychange', syncQuietTimer);
 }
-
-function syncQuietTimer(){
-  if(document.visibilityState==='visible'&&micActive&&!micPaused&&quietTimerStartAt){
-    const elapsed=Math.floor((Date.now()-quietTimerStartAt)/1000);
-    totalMicSeconds=totalMicSecAtStart+elapsed;
+function syncQuietTimer() {
+  if (document.visibilityState === 'visible' && micActive && !micPaused && quietTimerStartAt) {
+    const elapsed = Math.floor((Date.now() - quietTimerStartAt) / 1000);
+    totalMicSeconds = totalMicSecAtStart + elapsed;
     updateLiveRatio();
   }
 }
-
-function updateLiveRatio(){
-  if(totalMicSeconds===0)return;
-  const ratio=Math.round(quietSeconds/totalMicSeconds*100);
-  const qm=Math.floor(quietSeconds/60),qs=quietSeconds%60;
-  const tm=Math.floor(totalMicSeconds/60),ts=totalMicSeconds%60;
-
-  const badge=document.getElementById('live-ratio-badge');
-  const bar=document.getElementById('live-ratio-bar');
-  const lbl=document.getElementById('live-ratio-label');
-  const detail=document.getElementById('live-ratio-detail');
-  const qt=document.getElementById('live-quiet-time');
-  const tt=document.getElementById('live-total-time');
-
-  if(badge){
-    badge.textContent=ratio+'%';
-    badge.style.color=ratio>=75?'var(--accent-dark)':ratio>=50?'var(--amber)':'var(--red)';
-  }
-  if(bar){
-    bar.style.width=ratio+'%';
-    bar.style.background=ratio>=75?'var(--accent)':ratio>=50?'var(--amber)':'var(--red)';
-  }
-  if(lbl){
-    const info=ratio>=90?'🏆 Odak Ustası!':ratio>=75?'🥇 Harika!':ratio>=60?'🥈 İyi gidiyorsun':ratio>=45?'🥉 Biraz daha sessiz ol':'🌱 Gelişmeye devam';
-    lbl.textContent=info;
-  }
-  if(detail) detail.textContent=pad(qm)+':'+pad(qs)+' / '+pad(tm)+':'+pad(ts);
-  if(qt) qt.textContent=pad(qm)+':'+pad(qs);
-  if(tt) tt.textContent=pad(tm)+':'+pad(ts);
+function updateLiveRatio() {
+  if (totalMicSeconds === 0) return;
+  const ratio = Math.round(quietSeconds / totalMicSeconds * 100);
+  const qm = Math.floor(quietSeconds / 60), qs = quietSeconds % 60;
+  const tm = Math.floor(totalMicSeconds / 60), ts = totalMicSeconds % 60;
+  const badge  = document.getElementById('live-ratio-badge');
+  const bar    = document.getElementById('live-ratio-bar');
+  const lbl    = document.getElementById('live-ratio-label');
+  const detail = document.getElementById('live-ratio-detail');
+  const qt     = document.getElementById('live-quiet-time');
+  const tt     = document.getElementById('live-total-time');
+  const color  = ratio >= 75 ? 'var(--accent-dark)' : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
+  const bgClr  = ratio >= 75 ? 'var(--accent)'      : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
+  if (badge)  { badge.textContent = ratio + '%'; badge.style.color = color; }
+  if (bar)    { bar.style.width = ratio + '%'; bar.style.background = bgClr; }
+  if (lbl)    { lbl.textContent = ratio >= 90 ? '🏆 Odak Ustası!' : ratio >= 75 ? '🥇 Harika!' : ratio >= 60 ? '🥈 İyi gidiyorsun' : ratio >= 45 ? '🥉 Biraz daha sessiz ol' : '🌱 Gelişmeye devam'; }
+  if (detail) { detail.textContent = pad(qm) + ':' + pad(qs) + ' / ' + pad(tm) + ':' + pad(ts); }
+  if (qt)     { qt.textContent = pad(qm) + ':' + pad(qs); }
+  if (tt)     { tt.textContent = pad(tm) + ':' + pad(ts); }
 }
 
-// ── Odak ─────────────────────────────────────────────
-function showHint(){
-  detayCount++;document.getElementById('detay-count').textContent=detayCount;
-  const box=document.getElementById('hint-box');
-  box.textContent=hints[Math.floor(Math.random()*hints.length)];
+// ─── Yıldız sistemi ────────────────────────────────────
+function awardStar() {
+  const row = document.getElementById('star-row');
+  const placeholder = row.querySelector('span:not(.star)');
+  if (placeholder) placeholder.remove();
+  const star = document.createElement('span');
+  star.className = 'star'; star.textContent = '⭐';
+  row.appendChild(star);
+  const count = row.querySelectorAll('.star').length;
+  document.getElementById('star-total-label').textContent = count + ' ⭐';
+  showToast('⭐ Yıldız kazandın! Toplam: ' + count);
+}
+function updateStarCountdown() {
+  const m = Math.floor(starSecondsLeft / 60);
+  const s = starSecondsLeft % 60;
+  const el  = document.getElementById('star-timer-val');
+  const bar = document.getElementById('star-progress');
+  if (el)  el.textContent = pad(m) + ':' + pad(s);
+  if (bar) bar.style.width = ((starIntervalMin * 60 - starSecondsLeft) / (starIntervalMin * 60) * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════════
+//  SES EFEKTLERİ
+// ═══════════════════════════════════════════════════════
+
+// Gürültü uyarı beep'i
+let beepCtx = null;
+function playBeep() {
+  try {
+    if (!beepCtx) beepCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = beepCtx.createOscillator();
+    const gain = beepCtx.createGain();
+    osc.connect(gain); gain.connect(beepCtx.destination);
+    osc.type = 'sine'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.25, beepCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, beepCtx.currentTime + 0.35);
+    osc.start(beepCtx.currentTime); osc.stop(beepCtx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+// Pomodoro alarm: ders bitince yükselen arpej, mola bitince nazik iniş
+function playAlarm(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = ctx.createGain(); master.gain.value = 0.4; master.connect(ctx.destination);
+    const seq = type === 'work'
+      ? [{f:523,d:0.18,t:0.0},{f:659,d:0.18,t:0.20},{f:784,d:0.18,t:0.40},{f:1047,d:0.35,t:0.60},{f:1047,d:0.35,t:1.05}]
+      : [{f:784,d:0.22,t:0.0},{f:659,d:0.22,t:0.28},{f:523,d:0.40,t:0.56}];
+    seq.forEach(({f, d, t}) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(master);
+      osc.type = 'sine'; osc.frequency.value = f;
+      const st = ctx.currentTime + t;
+      gain.gain.setValueAtTime(0, st);
+      gain.gain.linearRampToValueAtTime(1, st + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, st + d + 0.1);
+      osc.start(st); osc.stop(st + d + 0.15);
+    });
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════════════════
+const STORE_KEY = 'duru_lgs_v4';
+function loadData() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; } }
+function saveData(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch {} }
+function pad(n) { return String(n).padStart(2, '0'); }
+function todayKey() { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+function loadToday() {
+  const data = loadData(), key = todayKey();
+  if (data[key]) {
+    const s = data[key];
+    subjects.forEach((sub, i) => { sub.done = s.subjects[i] || 0; });
+    pomosDone      = s.pomos || 0;
+    quietSeconds   = s.quietSec || 0;
+    totalMicSeconds= s.totalMicSec || 0;
+    updateDots();
+  }
+}
+function autoSaveToday() {
+  const data = loadData(), key = todayKey();
+  const ratio = totalMicSeconds > 0 ? Math.round(quietSeconds / totalMicSeconds * 100) : null;
+  data[key] = {
+    date: key, subjects: subjects.map(s => s.done),
+    pomos: pomosDone, total: subjects.reduce((a, s) => a + s.done, 0),
+    quietSec: quietSeconds, totalMicSec: totalMicSeconds, quietRatio: ratio,
+  };
+  saveData(data);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEKME
+// ═══════════════════════════════════════════════════════
+function showTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'istatistik') renderStats();
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════════
+function setMode(mode) {
+  clearInterval(timerInterval); clearInterval(alertInterval);
+  running = false;
+  document.getElementById('start-btn').textContent = '▶ Başlat';
+  document.getElementById('mode-work').classList.toggle('active', mode === 'work');
+  document.getElementById('mode-break').classList.toggle('active', mode === 'break');
+  if (mode === 'work') {
+    isBreak = false; timeLeft = WORK_MIN * 60; totalTime = WORK_MIN * 60;
+    document.getElementById('timer-sub').textContent = 'Çalışma süresi · 4 tur hedefi';
+  } else {
+    isBreak = true; timeLeft = BREAK_MIN * 60; totalTime = BREAK_MIN * 60;
+    document.getElementById('timer-sub').textContent = 'Mola · Dinlen!';
+    if (micActive && !micPaused) pauseMic();
+  }
+  updateTimerDisplay();
+}
+function updateTimerDisplay() {
+  document.getElementById('timer-display').textContent = pad(Math.floor(timeLeft / 60)) + ':' + pad(timeLeft % 60);
+  document.getElementById('timer-progress').style.width = (timeLeft / totalTime * 100) + '%';
+}
+let timerStartedAt = null, timeLeftAtStart = 0;
+function tick() {
+  if (!running) return;
+  const elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+  timeLeft = Math.max(0, timeLeftAtStart - elapsed);
+  updateTimerDisplay();
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval); clearInterval(alertInterval);
+    running = false;
+    document.getElementById('start-btn').textContent = '▶ Başlat';
+    if (!isBreak) {
+      playAlarm('work');
+      pomosDone = Math.min(4, pomosDone + 1); updateDots(); autoSaveToday();
+      document.getElementById('break-alert').style.display = 'flex';
+      setTimeout(() => document.getElementById('break-alert').style.display = 'none', 6000);
+      showToast('🎉 30 dakika tamamlandı! Mola zamanı.');
+      setMode('break');
+    } else {
+      playAlarm('break');
+      showToast('📚 Mola bitti! Çalışmaya devam.');
+      setMode('work');
+    }
+  }
+}
+function startAlertInterval() {
+  alertInterval = setInterval(() => {
+    dalmaCount++;
+    document.getElementById('dalma-count').textContent = dalmaCount;
+    document.getElementById('focus-alert').style.display = 'flex';
+    showToast('🔔 Duru, neredesin? Odaklan!');
+    setTimeout(() => document.getElementById('focus-alert').style.display = 'none', 5000);
+  }, ALERT_MIN * 60 * 1000);
+}
+function toggleTimer() {
+  if (running) {
+    clearInterval(timerInterval); clearInterval(alertInterval);
+    running = false;
+    timeLeft = Math.max(0, timeLeftAtStart - Math.floor((Date.now() - timerStartedAt) / 1000));
+    document.getElementById('start-btn').textContent = '▶ Devam';
+    updateTimerDisplay();
+    if (micActive && !micPaused) pauseMic();
+  } else {
+    timerStartedAt = Date.now(); timeLeftAtStart = timeLeft;
+    timerInterval = setInterval(tick, 500);
+    startAlertInterval();
+    running = true;
+    document.getElementById('start-btn').textContent = '⏸ Durdur';
+    if (!isBreak) startMicAuto();
+  }
+}
+function resetTimer() { setMode(isBreak ? 'break' : 'work'); }
+function updateDots() { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('done', i < pomosDone)); }
+
+// ═══════════════════════════════════════════════════════
+//  GÖREVLER
+// ═══════════════════════════════════════════════════════
+function renderSubjects() {
+  const grid = document.getElementById('subject-grid');
+  grid.innerHTML = ''; let totalDone = 0;
+  subjects.forEach((s, i) => {
+    totalDone += s.done;
+    const pct = Math.min(100, Math.round(s.done / s.target * 100));
+    const isDone = s.done >= s.target;
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    card.innerHTML = `
+      <div class="subject-header">
+        <span class="subject-name">${s.name}</span>
+        <span class="subject-badge ${isDone ? 'done' : ''}">${isDone ? '✓ Tamam' : s.done + '/' + s.target}</span>
+      </div>
+      <div class="subject-pct">${pct}% tamamlandı</div>
+      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      <div class="q-btns">
+        <button onclick="addQ(${i},-5)">-5</button>
+        <button onclick="addQ(${i},-1)">-1</button>
+        <button class="plus" onclick="addQ(${i},1)">+1</button>
+        <button class="plus" onclick="addQ(${i},5)">+5</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('total-done').textContent = totalDone;
+  document.getElementById('total-pct').textContent = '%' + Math.round(totalDone / (TARGET * SUBJECTS.length) * 100);
+  autoSaveToday();
+}
+function addQ(i, n) {
+  subjects[i].done = Math.max(0, subjects[i].done + n);
+  if (subjects[i].done >= subjects[i].target) showToast('🎉 ' + subjects[i].name + ' hedefine ulaştın!');
+  renderSubjects();
+}
+function saveDay() { autoSaveToday(); showToast('💾 Bugünün çalışması kaydedildi!'); }
+function resetDay() {
+  if (!confirm('Günü sıfırlamak istediğinden emin misin?')) return;
+  subjects.forEach(s => s.done = 0); pomosDone = 0; updateDots(); renderSubjects();
+  showToast('🔄 Yeni gün başladı! Hadi başla!');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ODAK
+// ═══════════════════════════════════════════════════════
+function showHint() {
+  detayCount++; document.getElementById('detay-count').textContent = detayCount;
+  const box = document.getElementById('hint-box');
+  box.textContent = hints[Math.floor(Math.random() * hints.length)];
   box.classList.add('show');
 }
-function sendFocusAlert(){
-  dalmaCount++;document.getElementById('dalma-count').textContent=dalmaCount;
+function sendFocusAlert() {
+  dalmaCount++; document.getElementById('dalma-count').textContent = dalmaCount;
   showToast('🔔 Neredeyim? Odaklan!');
-  document.getElementById('focus-alert').style.display='flex';
-  setTimeout(()=>document.getElementById('focus-alert').style.display='none',5000);
+  document.getElementById('focus-alert').style.display = 'flex';
+  setTimeout(() => document.getElementById('focus-alert').style.display = 'none', 5000);
 }
-function showMotivation(){
-  motivasyonCount++;document.getElementById('motivasyon-count').textContent=motivasyonCount;
-  const box=document.getElementById('motivasyon-box');
-  box.textContent=motivasyonlar[Math.floor(Math.random()*motivasyonlar.length)];
+function showMotivation() {
+  motivasyonCount++; document.getElementById('motivasyon-count').textContent = motivasyonCount;
+  const box = document.getElementById('motivasyon-box');
+  box.textContent = motivasyonlar[Math.floor(Math.random() * motivasyonlar.length)];
   box.classList.add('show');
 }
 
-// ── İstatistik ────────────────────────────────────────
-function changeWeek(dir){weekOffset+=dir;renderStats();}
-function getWeekDays(offset){
-  const today=new Date(),dayOfWeek=today.getDay();
-  const monday=new Date(today);
-  monday.setDate(today.getDate()-((dayOfWeek+6)%7)+offset*7);
-  return Array.from({length:7},(_,i)=>{
-    const d=new Date(monday);d.setDate(monday.getDate()+i);
-    const key=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
-    return{key,label:DAYS_TR[d.getDay()],date:d};
+// ═══════════════════════════════════════════════════════
+//  İSTATİSTİK
+// ═══════════════════════════════════════════════════════
+function changeWeek(dir) { weekOffset += dir; renderStats(); }
+function getWeekDays(offset) {
+  const today = new Date(), dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
+  return Array.from({length: 7}, (_, i) => {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    const key = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    return {key, label: DAYS_TR[d.getDay()], date: d};
   });
 }
-function renderStats(){
-  const data=loadData(),days=getWeekDays(weekOffset),todayK=todayKey();
-  const start=days[0].date,end=days[6].date;
-  const fmt=d=>pad2(d.getDate())+'/'+pad2(d.getMonth()+1);
-  document.getElementById('week-label').textContent=
-    weekOffset===0?'Bu Hafta ('+fmt(start)+' – '+fmt(end)+')':
-    weekOffset===-1?'Geçen Hafta ('+fmt(start)+' – '+fmt(end)+')':
-    fmt(start)+' – '+fmt(end);
+function renderStats() {
+  const data = loadData(), days = getWeekDays(weekOffset), todayK = todayKey();
+  const start = days[0].date, end = days[6].date;
+  const fmt = d => pad(d.getDate()) + '/' + pad(d.getMonth() + 1);
+  document.getElementById('week-label').textContent =
+    weekOffset === 0  ? 'Bu Hafta (' + fmt(start) + ' – ' + fmt(end) + ')' :
+    weekOffset === -1 ? 'Geçen Hafta (' + fmt(start) + ' – ' + fmt(end) + ')' :
+    fmt(start) + ' – ' + fmt(end);
 
-  const dailyTotals=days.map(d=>data[d.key]?data[d.key].total:0);
-  const dailyRatios=days.map(d=>data[d.key]?.quietRatio??null);
-  const maxVal=Math.max(...dailyTotals,10);
-  const weekTotal=dailyTotals.reduce((a,b)=>a+b,0);
-  const activeDays=dailyTotals.filter(v=>v>0).length;
-  const avgPerDay=activeDays>0?Math.round(weekTotal/activeDays):0;
-  const weekPomos=days.reduce((a,d)=>a+(data[d.key]?.pomos||0),0);
-  const ratioDays=dailyRatios.filter(r=>r!==null);
-  const avgRatio=ratioDays.length>0?Math.round(ratioDays.reduce((a,b)=>a+b,0)/ratioDays.length):null;
+  const dailyTotals = days.map(d => data[d.key] ? data[d.key].total : 0);
+  const dailyRatios = days.map(d => data[d.key]?.quietRatio ?? null);
+  const maxVal      = Math.max(...dailyTotals, 10);
+  const weekTotal   = dailyTotals.reduce((a, b) => a + b, 0);
+  const activeDays  = dailyTotals.filter(v => v > 0).length;
+  const weekPomos   = days.reduce((a, d) => a + (data[d.key]?.pomos || 0), 0);
+  const ratioDays   = dailyRatios.filter(r => r !== null);
+  const avgRatio    = ratioDays.length > 0 ? Math.round(ratioDays.reduce((a, b) => a + b, 0) / ratioDays.length) : null;
 
   // Bar chart
-  const barsEl=document.getElementById('day-bars');
-  barsEl.innerHTML='';
-  days.forEach((d,i)=>{
-    const val=dailyTotals[i],ratio=dailyRatios[i],isToday=d.key===todayK;
-    const pct=Math.round((val/maxVal)*100);
-    const ratioColor=ratio===null?'var(--text-hint)':ratio>=75?'var(--accent-dark)':ratio>=50?'var(--amber)':'var(--red)';
-    const col=document.createElement('div');
-    col.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;';
-    col.innerHTML=`
-      <div style="font-size:10px;color:var(--text-sec);font-weight:500;">${val>0?val:''}</div>
+  const barsEl = document.getElementById('day-bars');
+  barsEl.innerHTML = '';
+  days.forEach((d, i) => {
+    const val = dailyTotals[i], ratio = dailyRatios[i], isToday = d.key === todayK;
+    const pct = Math.round((val / maxVal) * 100);
+    const rColor = ratio === null ? 'var(--text-hint)' : ratio >= 75 ? 'var(--accent-dark)' : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;';
+    col.innerHTML = `
+      <div style="font-size:10px;color:var(--text-sec);font-weight:500;">${val > 0 ? val : ''}</div>
       <div style="width:100%;display:flex;align-items:flex-end;height:90px;">
-        <div style="width:100%;height:${Math.max(4,pct)}%;border-radius:6px 6px 0 0;background:${val===0?'var(--bg-sec)':isToday?'var(--accent-dark)':'var(--accent)'};transition:height .4s;"></div>
+        <div style="width:100%;height:${Math.max(4, pct)}%;border-radius:6px 6px 0 0;background:${val === 0 ? 'var(--bg-sec)' : isToday ? 'var(--accent-dark)' : 'var(--accent)'};transition:height .4s;"></div>
       </div>
       <div style="font-size:10px;color:var(--text-hint);">${d.label}</div>
-      <div style="font-size:10px;font-weight:600;color:${ratioColor};">${ratio!==null?ratio+'%':''}</div>`;
+      <div style="font-size:10px;font-weight:600;color:${rColor};">${ratio !== null ? ratio + '%' : ''}</div>`;
     barsEl.appendChild(col);
   });
 
-  // Hafta özeti
-  document.getElementById('week-stats').innerHTML=`
+  document.getElementById('week-stats').innerHTML = `
     <div class="week-stat"><div class="num">${weekTotal}</div><div class="lbl">Toplam soru</div></div>
     <div class="week-stat"><div class="num">${activeDays}</div><div class="lbl">Aktif gün</div></div>
     <div class="week-stat"><div class="num">${weekPomos}</div><div class="lbl">Tur</div></div>
-    <div class="week-stat"><div class="num" style="color:${avgRatio===null?'var(--text)':avgRatio>=75?'var(--accent-dark)':avgRatio>=50?'var(--amber)':'var(--red)'}">${avgRatio!==null?avgRatio+'%':'--'}</div><div class="lbl">Ort. Sessizlik</div></div>`;
+    <div class="week-stat"><div class="num" style="color:${avgRatio === null ? 'var(--text)' : avgRatio >= 75 ? 'var(--accent-dark)' : avgRatio >= 50 ? 'var(--amber)' : 'var(--red)'}">${avgRatio !== null ? avgRatio + '%' : '--'}</div><div class="lbl">Ort. Sessizlik</div></div>`;
 
-  // ── Ödül Sistemi ──────────────────────────────────────
-  const REWARDS=[
-    {minRatio:0,  minSoru:0,   emoji:'🌱', title:'Başlangıç',      desc:'Henüz veri toplanıyor. Çalışmaya devam!',               color:'var(--bg-sec)'},
-    {minRatio:45, minSoru:30,  emoji:'🥉', title:'Bronz Hafta',    desc:'İyi başlangıç! Sessizlik oranını artırmayı dene.',       color:'#CD7F32'},
-    {minRatio:60, minSoru:60,  emoji:'🥈', title:'Gümüş Hafta',    desc:'Güzel! Odaklanma alışkanlığın gelişiyor.',              color:'#9EA8B3'},
-    {minRatio:75, minSoru:90,  emoji:'🥇', title:'Altın Hafta',    desc:'Muhteşem! Hem sessiz hem üretken bir hafta.',            color:'#F5C518'},
-    {minRatio:85, minSoru:100, emoji:'💎', title:'Elmas Hafta',    desc:'İnanılmaz konsantrasyon! Bunu hak ediyorsun.',           color:'#63D1F4'},
-    {minRatio:90, minSoru:120, emoji:'🏆', title:'Şampiyon Hafta', desc:'Tam hedef! %90+ sessizlik + tüm sorular. BRAVİ Duru!',   color:'var(--accent-dark)'},
+  // Ödül paneli
+  const REWARDS = [
+    {minRatio:0,  minSoru:0,   emoji:'🌱', title:'Başlangıç',      desc:'Henüz veri toplanıyor. Çalışmaya devam!',              color:'var(--bg-sec)'},
+    {minRatio:45, minSoru:30,  emoji:'🥉', title:'Bronz Hafta',    desc:'İyi başlangıç! Sessizlik oranını artırmayı dene.',      color:'#CD7F32'},
+    {minRatio:60, minSoru:60,  emoji:'🥈', title:'Gümüş Hafta',    desc:'Güzel! Odaklanma alışkanlığın gelişiyor.',             color:'#9EA8B3'},
+    {minRatio:75, minSoru:90,  emoji:'🥇', title:'Altın Hafta',    desc:'Muhteşem! Hem sessiz hem üretken bir hafta.',           color:'#F5C518'},
+    {minRatio:85, minSoru:100, emoji:'💎', title:'Elmas Hafta',    desc:'İnanılmaz konsantrasyon! Bunu hak ediyorsun.',          color:'#63D1F4'},
+    {minRatio:90, minSoru:120, emoji:'🏆', title:'Şampiyon Hafta', desc:'Tam hedef! %90+ sessizlik + tüm sorular. BRAVİ Duru!', color:'var(--accent-dark)'},
   ];
-  const effectiveRatio=avgRatio??0;
-  let reward=REWARDS[0];
-  for(const r of REWARDS){if(effectiveRatio>=r.minRatio&&weekTotal>=r.minSoru)reward=r;}
-  const rc=document.getElementById('reward-card');
-  const rcContent=document.getElementById('reward-content');
-  if(avgRatio!==null||weekTotal>0){
-    rc.style.display='block';
-    rc.style.borderColor=reward.color;
-    rcContent.innerHTML=`
+  const effectiveRatio = avgRatio ?? 0;
+  let reward = REWARDS[0];
+  for (const r of REWARDS) { if (effectiveRatio >= r.minRatio && weekTotal >= r.minSoru) reward = r; }
+  const rc = document.getElementById('reward-card'), rcContent = document.getElementById('reward-content');
+  if (avgRatio !== null || weekTotal > 0) {
+    rc.style.display = 'block'; rc.style.borderColor = reward.color;
+    rcContent.innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
         <div style="font-size:40px;line-height:1;">${reward.emoji}</div>
-        <div>
-          <div style="font-size:16px;font-weight:700;color:${reward.color};">${reward.title}</div>
-          <div style="font-size:13px;color:var(--text-sec);margin-top:2px;">${reward.desc}</div>
-        </div>
+        <div><div style="font-size:16px;font-weight:700;color:${reward.color};">${reward.title}</div>
+          <div style="font-size:13px;color:var(--text-sec);margin-top:2px;">${reward.desc}</div></div>
       </div>
-      ${avgRatio!==null?`
-      <div style="margin-bottom:12px;">
+      ${avgRatio !== null ? `<div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
           <span style="font-size:12px;color:var(--text-sec);">Haftalık Ort. Sessizlik</span>
           <span style="font-size:13px;font-weight:700;color:${avgRatio>=75?'var(--accent-dark)':avgRatio>=50?'var(--amber)':'var(--red)'};">${avgRatio}%</span>
         </div>
         <div style="height:8px;background:var(--bg-sec);border-radius:99px;overflow:hidden;">
           <div style="height:100%;width:${avgRatio}%;border-radius:99px;background:${avgRatio>=75?'var(--accent)':avgRatio>=50?'var(--amber)':'var(--red)'};transition:width .5s;"></div>
-        </div>
-      </div>`:''}
+        </div></div>` : ''}
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${REWARDS.slice(1).map(r=>{
-          const achieved=effectiveRatio>=r.minRatio&&weekTotal>=r.minSoru;
-          return`<div style="flex:1;min-width:70px;padding:8px 6px;border-radius:var(--radius-md);background:${achieved?r.color+'22':'var(--bg-sec)'};border:1px solid ${achieved?r.color:'var(--border)'};text-align:center;opacity:${achieved?1:0.45};">
+        ${REWARDS.slice(1).map(r => {
+          const achieved = effectiveRatio >= r.minRatio && weekTotal >= r.minSoru;
+          return `<div style="flex:1;min-width:70px;padding:8px 6px;border-radius:var(--radius-md);background:${achieved?r.color+'22':'var(--bg-sec)'};border:1px solid ${achieved?r.color:'var(--border)'};text-align:center;opacity:${achieved?1:0.45};">
             <div style="font-size:18px;">${r.emoji}</div>
             <div style="font-size:10px;font-weight:600;color:${achieved?r.color:'var(--text-hint)'};">${r.title}</div>
-            <div style="font-size:10px;color:var(--text-hint);">%${r.minRatio}+ · ${r.minSoru}s</div>
-          </div>`;
+            <div style="font-size:10px;color:var(--text-hint);">%${r.minRatio}+ · ${r.minSoru}s</div></div>`;
         }).join('')}
       </div>`;
-  }else{rc.style.display='none';}
+  } else { rc.style.display = 'none'; }
 
   // Derse göre
-  const subjectWeekTotals=SUBJECTS.map((s,si)=>days.reduce((a,d)=>a+(data[d.key]?.subjects?.[si]||0),0));
-  const maxSubj=Math.max(...subjectWeekTotals,1);
-  document.getElementById('subject-week').innerHTML=SUBJECTS.map((s,i)=>`
+  const swt = SUBJECTS.map((s, si) => days.reduce((a, d) => a + (data[d.key]?.subjects?.[si] || 0), 0));
+  const maxSubj = Math.max(...swt, 1);
+  document.getElementById('subject-week').innerHTML = SUBJECTS.map((s, i) => `
     <div class="subject-week-row">
       <div class="subject-week-name">${s.name}</div>
-      <div class="subject-week-bar-wrap"><div class="subject-week-bar" style="width:${Math.round(subjectWeekTotals[i]/maxSubj*100)}%;background:${s.color};"></div></div>
-      <div class="subject-week-val">${subjectWeekTotals[i]} soru</div>
+      <div class="subject-week-bar-wrap"><div class="subject-week-bar" style="width:${Math.round(swt[i]/maxSubj*100)}%;background:${s.color};"></div></div>
+      <div class="subject-week-val">${swt[i]} soru</div>
     </div>`).join('');
 
-  // Günlük geçmiş
-  const hl=document.getElementById('history-list');
-  const sortedDays=days.filter(d=>data[d.key]).reverse();
-  if(!sortedDays.length){
-    hl.innerHTML='<div style="font-size:13px;color:var(--text-hint);padding:8px 0;">Bu haftaya ait kayıt yok.</div>';
+  // Geçmiş
+  const hl = document.getElementById('history-list');
+  const sortedDays = days.filter(d => data[d.key]).reverse();
+  if (!sortedDays.length) {
+    hl.innerHTML = '<div style="font-size:13px;color:var(--text-hint);padding:8px 0;">Bu haftaya ait kayıt yok.</div>';
     return;
   }
-  hl.innerHTML=sortedDays.map(d=>{
-    const rec=data[d.key];
-    const dateObj=new Date(d.key+'T12:00:00');
-    const dateStr=pad2(dateObj.getDate())+'/'+pad2(dateObj.getMonth()+1)+'/'+dateObj.getFullYear()+' · '+DAYS_TR[dateObj.getDay()];
-    const subjectStr=SUBJECTS.map((s,i)=>rec.subjects[i]>0?s.name+': '+rec.subjects[i]:'').filter(Boolean).join(', ')||'—';
-    const ratio=rec.quietRatio;
-    const ratioColor=ratio===undefined?'var(--text-sec)':ratio>=75?'var(--accent-dark)':ratio>=50?'var(--amber)':'var(--red)';
-    const ratioEmoji=ratio===undefined?'':ratio>=90?'🏆':ratio>=75?'🥇':ratio>=60?'🥈':ratio>=45?'🥉':'🌱';
-    const quietMin=rec.quietSec?Math.floor(rec.quietSec/60)+'dk':'';
-    return`<div class="history-day">
+  hl.innerHTML = sortedDays.map(d => {
+    const rec = data[d.key];
+    const dateObj = new Date(d.key + 'T12:00:00');
+    const dateStr = pad(dateObj.getDate()) + '/' + pad(dateObj.getMonth()+1) + '/' + dateObj.getFullYear() + ' · ' + DAYS_TR[dateObj.getDay()];
+    const subjectStr = SUBJECTS.map((s, i) => rec.subjects[i] > 0 ? s.name + ': ' + rec.subjects[i] : '').filter(Boolean).join(', ') || '—';
+    const ratio = rec.quietRatio;
+    const rColor = ratio === undefined ? 'var(--text-sec)' : ratio >= 75 ? 'var(--accent-dark)' : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
+    const rEmoji = ratio === undefined ? '' : ratio >= 90 ? '🏆' : ratio >= 75 ? '🥇' : ratio >= 60 ? '🥈' : ratio >= 45 ? '🥉' : '🌱';
+    const qMin   = rec.quietSec ? Math.floor(rec.quietSec / 60) + 'dk' : '';
+    return `<div class="history-day">
       <div class="history-day-header">
         <span class="history-day-date">${dateStr}</span>
-        <span class="history-day-total">${rec.total} soru · ${rec.pomos||0} tur</span>
+        <span class="history-day-total">${rec.total} soru · ${rec.pomos || 0} tur</span>
       </div>
       <div class="history-day-subjects">${subjectStr}</div>
-      ${ratio!==undefined?`<div class="history-day-stars" style="color:${ratioColor}">${ratioEmoji} Sessizlik oranı: %${ratio} ${quietMin?'· 🔇 '+quietMin+' sessiz':''}</div>`:''}
+      ${ratio !== undefined ? `<div class="history-day-stars" style="color:${rColor}">${rEmoji} Sessizlik: %${ratio} ${qMin ? '· 🔇 ' + qMin + ' sessiz' : ''}</div>` : ''}
     </div>`;
   }).join('');
 }
 
-// ── Init ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+//  BAŞLANGIÇ
+// ═══════════════════════════════════════════════════════
 loadToday();
 renderSubjects();
 updateTimerDisplay();
-// Yıldız sayacı göstergesi
-document.getElementById('star-timer-val').textContent=pad(starIntervalMin)+':00';
+updateStarCountdown();
+updateThresholdUI();
 </script>
 </body>
 </html>
