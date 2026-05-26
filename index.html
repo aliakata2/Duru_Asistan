@@ -83,14 +83,13 @@
     .stat-lbl{font-size:12px;color:var(--text-sec);margin-top:2px;}
     .hint-box{background:var(--bg-sec);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;color:var(--text-sec);line-height:1.6;display:none;margin-top:8px;}
     .hint-box.show{display:block;}
-    /* Ses ölçer */
-    .db-meter-wrap{position:relative;margin:1rem 0;}
-    .db-meter-track{height:28px;background:var(--bg-sec);border-radius:99px;overflow:hidden;position:relative;}
-    .db-meter-fill{height:100%;border-radius:99px;transition:width .08s linear,background .2s;}
-    .db-meter-needle{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.25);border-radius:99px;transform:translateX(-50%);transition:left .3s;}
     .db-value{font-size:42px;font-weight:300;letter-spacing:-2px;text-align:center;font-variant-numeric:tabular-nums;transition:color .2s;}
     .db-value.ok{color:var(--accent-dark);}
     .db-value.loud{color:var(--red);}
+    .db-meter-wrap{position:relative;margin:1rem 0;}
+    .db-meter-track{height:28px;background:var(--bg-sec);border-radius:99px;overflow:hidden;position:relative;}
+    .db-meter-fill{height:100%;border-radius:99px;transition:width .08s linear,background .2s;}
+    .db-meter-needle{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.25);border-radius:99px;transform:translateX(-50%);}
     .db-label{font-size:12px;color:var(--text-hint);text-align:center;margin-bottom:1rem;}
     .star-row{display:flex;flex-wrap:wrap;gap:6px;min-height:32px;align-items:center;}
     .star{font-size:22px;animation:starPop .35s cubic-bezier(.17,.67,.83,.67);}
@@ -98,7 +97,6 @@
     .star-countdown{font-size:13px;color:var(--text-sec);display:flex;align-items:center;gap:6px;margin-top:6px;}
     .star-progress-wrap{flex:1;height:6px;background:var(--bg-sec);border-radius:99px;overflow:hidden;}
     .star-progress-fill{height:100%;background:var(--star);border-radius:99px;transition:width 1s linear;}
-    /* İstatistik */
     .week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
     .week-nav span{font-size:14px;font-weight:600;}
     .week-nav button{padding:6px 14px;}
@@ -176,7 +174,7 @@
       <span>Harika! 1 tur tamamlandı. 10 dakika mola hakkın var.</span>
     </div>
 
-    <!-- Canlı Ses Paneli (Pomodoro sekmesinde) -->
+    <!-- Canlı Ses Paneli -->
     <div class="card" id="live-sound-panel" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;">
@@ -185,12 +183,11 @@
         </div>
         <button class="btn" id="live-pause-btn" onclick="toggleMicPause()" style="font-size:11px;padding:4px 12px;">⏸ Durdur</button>
       </div>
-      <!-- Mini metre -->
+      <!-- dB bar -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <span style="font-size:11px;color:var(--text-hint);width:28px;text-align:right;" id="live-db-val">--</span>
         <div style="flex:1;height:12px;background:var(--bg-sec);border-radius:99px;overflow:hidden;position:relative;">
           <div id="live-db-bar" style="height:100%;width:0%;border-radius:99px;background:var(--accent);transition:width .08s;"></div>
-          <!-- eşik işareti -->
           <div id="live-threshold-tick" style="position:absolute;top:0;bottom:0;width:2px;background:var(--amber);opacity:.8;"></div>
         </div>
         <span style="font-size:10px;color:var(--text-hint);width:28px;">dBFS</span>
@@ -206,10 +203,10 @@
         </div>
         <div style="position:relative;background:var(--bg-sec);border-radius:var(--radius-md);overflow:hidden;">
           <canvas id="db-chart" height="90" style="width:100%;display:block;"></canvas>
-          <div id="chart-top-lbl"    style="position:absolute;top:4px;left:6px;font-size:9px;color:var(--text-hint);">0 dBFS</div>
-          <div id="chart-mid-lbl"    style="position:absolute;top:28px;left:6px;font-size:9px;color:var(--text-hint);">-40</div>
+          <div style="position:absolute;top:4px;left:6px;font-size:9px;color:var(--text-hint);">0 dBFS</div>
+          <div style="position:absolute;top:28px;left:6px;font-size:9px;color:var(--text-hint);">-40</div>
           <div id="chart-threshold-lbl" style="position:absolute;left:6px;font-size:9px;color:var(--amber);font-weight:600;"></div>
-          <div id="chart-bot-lbl"    style="position:absolute;bottom:16px;left:6px;font-size:9px;color:var(--text-hint);">-80</div>
+          <div style="position:absolute;bottom:16px;left:6px;font-size:9px;color:var(--text-hint);">-80</div>
         </div>
         <div style="display:flex;justify-content:space-between;padding:0 2px;margin-top:3px;">
           <span style="font-size:10px;color:var(--text-hint);">0dk</span>
@@ -223,7 +220,7 @@
       <!-- Sessizlik oranı -->
       <div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <span style="font-size:12px;color:var(--text-sec);">Sessizlik Oranı</span>
+          <span style="font-size:12px;color:var(--text-sec);">Sessizlik Oranı <span style="font-size:10px;">(son 5 dk)</span></span>
           <span id="live-ratio-badge" style="font-size:13px;font-weight:700;color:var(--accent-dark);">--%</span>
         </div>
         <div style="height:10px;background:var(--bg-sec);border-radius:99px;overflow:hidden;margin-bottom:6px;">
@@ -246,6 +243,19 @@
           <div style="font-size:11px;color:var(--text-sec);margin-top:2px;">Toplam ölçüm</div>
         </div>
       </div>
+
+      <!-- Konuşma modu -->
+      <div id="conversation-bar" style="background:var(--purple-light);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:10px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:13px;color:var(--purple);font-weight:600;">💬 Konuşma modu — <span id="conv-countdown"></span> kaldı</span>
+          <button class="btn" onclick="stopConversation()" style="font-size:11px;padding:4px 10px;">✕ Kapat</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button class="btn" onclick="startConversation(5)" style="flex:1;font-size:12px;">💬 5 dk Konuşma</button>
+        <button class="btn" onclick="startConversation(10)" style="flex:1;font-size:12px;">💬 10 dk Konuşma</button>
+      </div>
+
       <div id="live-loud-alert" class="alert danger" style="display:none;margin-top:10px;">
         <span class="alert-icon">📢</span>
         <span id="live-loud-text">Gürültü algılandı!</span>
@@ -273,7 +283,7 @@
     </div>
   </div>
 
-  <!-- SES ÖLÇER -->
+  <!-- SES -->
   <div class="section" id="tab-ses">
     <div class="card">
       <div class="card-title">🎤 Sessizlik Ölçer</div>
@@ -286,18 +296,14 @@
         <button class="btn primary" id="mic-btn" onclick="toggleMic()" style="padding:10px 28px;font-size:14px;">🎤 Mikrofonu Başlat</button>
       </div>
       <div id="mic-panel" style="display:none">
-        <!-- Ana metre -->
         <div class="db-value ok" id="db-display">-- dBFS</div>
         <div class="db-meter-wrap">
           <div class="db-meter-track">
             <div class="db-meter-fill" id="db-bar" style="width:0%;background:var(--accent);"></div>
-            <!-- eşik çubuğu -->
             <div id="db-threshold-needle" class="db-meter-needle" style="left:50%;"></div>
           </div>
         </div>
         <div class="db-label" id="db-label-text">Sessiz (eşik: -35 dBFS)</div>
-
-        <!-- Yıldızlar -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-top:1rem;">
           <div style="font-size:13px;font-weight:600;">Bugün kazanılan yıldızlar</div>
           <div style="font-size:13px;color:var(--text-sec);" id="star-total-label">0 ⭐</div>
@@ -306,7 +312,7 @@
           <span style="font-size:13px;color:var(--text-hint);">Henüz yıldız yok — sessiz çalışmaya devam!</span>
         </div>
         <div class="star-countdown" style="margin-top:12px;">
-          <span style="font-size:13px;color:var(--text-sec);" id="star-timer-lbl">Sonraki ⭐ için:</span>
+          <span style="font-size:13px;color:var(--text-sec);">Sonraki ⭐ için:</span>
           <div class="star-progress-wrap"><div class="star-progress-fill" id="star-progress" style="width:0%"></div></div>
           <span style="font-size:12px;font-weight:600;color:var(--star);" id="star-timer-val">5:00</span>
         </div>
@@ -316,16 +322,13 @@
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">📋 Ayarlar</div>
-      <!-- Eşik -->
       <div style="margin-bottom:14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <label style="font-size:13px;">Gürültü eşiği</label>
           <span style="font-size:13px;font-weight:600;" id="db-threshold-val">-35 dBFS</span>
         </div>
-        <!-- Görsel referans bandı -->
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-bottom:4px;">
           <span>Hassas</span><span>Orta</span><span>Gevşek</span>
         </div>
@@ -336,7 +339,6 @@
           <span>-60 dBFS</span><span>fısıltı ≈ -35</span><span>-10 dBFS</span>
         </div>
       </div>
-      <!-- Yıldız aralığı -->
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <label style="font-size:13px;">Yıldız için sessiz süre</label>
@@ -346,22 +348,18 @@
                style="width:100%;accent-color:var(--accent-dark);"
                oninput="updateStarInterval(+this.value)">
       </div>
+      <!-- Alarm testi -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">🔔 Alarm Testi</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" onclick="playAlarm('work')" style="flex:1;">▶ Ders Bitti</button>
+          <button class="btn" onclick="playAlarm('break')" style="flex:1;">▶ Mola Bitti</button>
+        </div>
+      </div>
     </div>
-<!-- Alarm test -->
-<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
-  <div style="font-size:13px;font-weight:600;margin-bottom:8px;">🔔 Alarm Testi</div>
-  <div style="display:flex;gap:8px;">
-    <button class="btn" onclick="playAlarm('work')" style="flex:1;">▶ Ders Bitti Alarmı</button>
-    <button class="btn" onclick="playAlarm('break')" style="flex:1;">▶ Mola Bitti Alarmı</button>
-  </div>
-</div>
-
-    <!-- Nasıl çalışır? -->
     <div class="card">
       <div class="card-title">ℹ️ Ölçüm hakkında</div>
-      <div class="card-desc" style="margin-bottom:0;">
-        Değerler <b>dBFS</b> (Full Scale'e göre desibel) cinsindendir. 0 dBFS mikrofon maksimumu, -80 dBFS tam sessizliktir. Sessiz bir odada mikrofon genellikle -55 ile -65 dBFS arası gösterir. Konuşma -25 ile -15 dBFS civarındadır. Eşiği kendi ortamına göre ayarla: başlat, sessizce otur, göster değeri not et, eşiği onun biraz üstüne getir.
-      </div>
+      <div class="card-desc" style="margin-bottom:0;">Değerler <b>dBFS</b> cinsindendir. 0 dBFS mikrofon maksimumu, -80 dBFS tam sessizliktir. Sessiz bir odada mikrofon genellikle -55 ile -65 dBFS arası gösterir. Konuşma -25 ile -15 dBFS civarındadır. Eşiği kendi ortamına göre ayarla.</div>
     </div>
   </div>
 
@@ -428,7 +426,7 @@ const SUBJECTS=[
   {name:'Fen',color:'#EF9F27'},{name:'İngilizce',color:'#1D9E75'},
   {name:'Sosyal',color:'#D4537E'},{name:'Din',color:'#378ADD'},
 ];
-const TARGET=20, WORK_MIN=30, BREAK_MIN=10, ALERT_MIN=7;
+const TARGET=20,WORK_MIN=30,BREAK_MIN=10,ALERT_MIN=7;
 const DAYS_TR=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
 const hints=[
   '📌 Bu detay lisede anlatılacak — şimdilik kuralı uygula ve devam et!',
@@ -446,642 +444,565 @@ const motivasyonlar=[
 ];
 
 // ═══════════════════════════════════════════════════════
-//  GENEL STATE
+//  STATE
 // ═══════════════════════════════════════════════════════
 let subjects=SUBJECTS.map(s=>({...s,done:0,target:TARGET}));
-let timerInterval=null, alertInterval=null;
-let timeLeft=WORK_MIN*60, totalTime=WORK_MIN*60;
-let running=false, isBreak=false, pomosDone=0;
-let dalmaCount=0, detayCount=0, motivasyonCount=0;
+let timerInterval=null,alertInterval=null;
+let timeLeft=WORK_MIN*60,totalTime=WORK_MIN*60;
+let running=false,isBreak=false,pomosDone=0;
+let dalmaCount=0,detayCount=0,motivasyonCount=0;
 let weekOffset=0;
 
-// Ses ölçer temel state
-let micActive=false, micPaused=false;
-let audioCtx=null, analyser=null, micStream=null;
-let rafId=null, chartAnimFrame=null;
-let dbRafRunning=false;
-let currentDb=-80;           // anlık pürüzsüzleştirilmiş dBFS değeri
-let quietSeconds=0;
-let totalMicSeconds=0;
-let quietTimer=null;
-let loudTimeout=null;
+// Ses
+let micActive=false,micPaused=false;
+let audioCtx=null,analyser=null,micStream=null;
+let rafId=null,chartAnimFrame=null,dbRafRunning=false;
+let currentDb=-80;
+let quietSeconds=0,totalMicSeconds=0;
+let quietTimer=null,loudTimeout=null;
 
-// Yıldız state
-let starIntervalMin=5;
-let starSecondsLeft=5*60;
+// Yıldız
+let starIntervalMin=5,starSecondsLeft=5*60;
+
+// Konuşma modu
+let conversationMode=false;
+let conversationInterval=null,conversationSecondsLeft=0;
+
+// Sessizlik geçmişi (son 5 dk kayan pencere)
+const RATIO_WINDOW=5*60;
+let quietHistory=[];
 
 // ═══════════════════════════════════════════════════════
-//  SES ÖLÇER — YENİDEN YAZILDI
-//  Gerçek dBFS ölçümü + asimetrik EMA pürüzsüzleştirme
+//  SES ÖLÇER — dBFS + Asimetrik EMA
 // ═══════════════════════════════════════════════════════
+const DB_FLOOR=-80,DB_CEIL=0;
+const ALPHA_ATTACK=0.35,ALPHA_RELEASE=0.04;
+let smoothedDb=DB_FLOOR;
+let dbThreshold=-35;
 
-// dBFS skala sınırları (görsel)
-const DB_FLOOR = -80;  // tam sessizlik alt sınırı
-const DB_CEIL  =   0;  // maksimum ses üst sınırı
-
-// Asimetrik EMA: sese hızlı tepki (0.35), sessizliğe yavaş dönüş (0.04)
-// Bu sayede kısa ses patlamalarında metre hemen yükselir,
-// sessizleştikten sonra ise yavaşça düşer — çok daha kararlı okuma.
-const ALPHA_ATTACK  = 0.35;
-const ALPHA_RELEASE = 0.04;
-
-let smoothedDb = DB_FLOOR;   // EMA değeri, DB_FLOOR'dan başlar
-let dbThreshold = -35;       // gürültü/sessiz sınırı (dBFS), kullanıcı değiştirebilir
-
-// Ham RMS hesabı — Float32 ile tam hassasiyet, fftSize kadar örnek
-function computeRawDbFS() {
-  if (!analyser) return DB_FLOOR;
-  const buf = new Float32Array(analyser.fftSize);
+function computeRawDbFS(){
+  if(!analyser)return DB_FLOOR;
+  const buf=new Float32Array(analyser.fftSize);
   analyser.getFloatTimeDomainData(buf);
-  let sum = 0;
-  for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
-  const rms = Math.sqrt(sum / buf.length);
-  if (rms < 1e-7) return DB_FLOOR;                          // neredeyse sıfır → taban
-  return Math.max(DB_FLOOR, Math.min(DB_CEIL, 20 * Math.log10(rms)));
+  let sum=0;
+  for(let i=0;i<buf.length;i++)sum+=buf[i]*buf[i];
+  const rms=Math.sqrt(sum/buf.length);
+  if(rms<1e-7)return DB_FLOOR;
+  return Math.max(DB_FLOOR,Math.min(DB_CEIL,20*Math.log10(rms)));
 }
-
-// Pürüzsüzleştirilmiş dBFS — her animasyon karesinde çağrılır
-function getSmoothedDb() {
-  const raw = computeRawDbFS();
-  // Ses yükseldiyse hızlı al, düştüyse yavaş bırak
-  const alpha = raw > smoothedDb ? ALPHA_ATTACK : ALPHA_RELEASE;
-  smoothedDb = alpha * raw + (1 - alpha) * smoothedDb;
+function getSmoothedDb(){
+  const raw=computeRawDbFS();
+  const alpha=raw>smoothedDb?ALPHA_ATTACK:ALPHA_RELEASE;
+  smoothedDb=alpha*raw+(1-alpha)*smoothedDb;
   return smoothedDb;
 }
-
-// dBFS → görsel bar yüzdesi (0–100)
-function dbToPercent(db) {
-  return Math.max(0, Math.min(100,
-    ((db - DB_FLOOR) / (DB_CEIL - DB_FLOOR)) * 100
-  ));
+function dbToPercent(db){
+  return Math.max(0,Math.min(100,((db-DB_FLOOR)/(DB_CEIL-DB_FLOOR))*100));
 }
-
-// dBFS → canvas Y koordinatı
-function dbToY(db, H) {
-  const pct = (Math.max(DB_FLOOR, Math.min(DB_CEIL, db)) - DB_FLOOR) / (DB_CEIL - DB_FLOOR);
-  return H - pct * (H - 12) - 4;
+function dbToY(db,H){
+  const pct=(Math.max(DB_FLOOR,Math.min(DB_CEIL,db))-DB_FLOOR)/(DB_CEIL-DB_FLOOR);
+  return H-pct*(H-12)-4;
 }
-
-// Eşik iğnesini hem ana sekmede hem Pomodoro panelinde güncelle
-function updateThresholdUI() {
-  const pct = dbToPercent(dbThreshold);
-  // Ana sekme iğnesi
-  const needle = document.getElementById('db-threshold-needle');
-  if (needle) needle.style.left = pct + '%';
-  // Canlı panel iğnesi
-  const liveTick = document.getElementById('live-threshold-tick');
-  if (liveTick) liveTick.style.left = pct + '%';
-  // Etiketler
-  document.getElementById('db-threshold-val').textContent = dbThreshold + ' dBFS';
-  const lbl = document.getElementById('db-label-text');
-  if (lbl) lbl.textContent = (currentDb <= dbThreshold ? 'Sessiz' : 'Gürültülü') + ' (eşik: ' + dbThreshold + ' dBFS)';
+function updateThresholdUI(){
+  const pct=dbToPercent(dbThreshold);
+  const needle=document.getElementById('db-threshold-needle');
+  if(needle)needle.style.left=pct+'%';
+  const tick=document.getElementById('live-threshold-tick');
+  if(tick)tick.style.left=pct+'%';
+  document.getElementById('db-threshold-val').textContent=dbThreshold+' dBFS';
+  const lbl=document.getElementById('db-label-text');
+  if(lbl)lbl.textContent=(currentDb<=dbThreshold?'Sessiz':'Gürültülü')+' (eşik: '+dbThreshold+' dBFS)';
 }
-function updateThreshold(v) {
-  dbThreshold = v;
-  updateThresholdUI();
-}
-function updateStarInterval(v) {
-  starIntervalMin = v;
-  document.getElementById('star-interval-val').textContent = v + ' dk';
-  starSecondsLeft = starIntervalMin * 60;
+function updateThreshold(v){dbThreshold=v;updateThresholdUI();}
+function updateStarInterval(v){
+  starIntervalMin=v;
+  document.getElementById('star-interval-val').textContent=v+' dk';
+  starSecondsLeft=starIntervalMin*60;
   updateStarCountdown();
 }
 
-// ─── Mikrofon başlatma / durdurma ──────────────────────
-function initMic(stream) {
-  micStream = stream;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 2048;          // 2048 örnek — yeterli çözünürlük
-  analyser.smoothingTimeConstant = 0; // EMA'yı biz yapıyoruz, Web Audio'nun kendi smoothing'ini kapat
-  const src = audioCtx.createMediaStreamSource(stream);
+// ── Mikrofon ───────────────────────────────────────────
+function initMic(stream){
+  micStream=stream;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  analyser=audioCtx.createAnalyser();
+  analyser.fftSize=2048;
+  analyser.smoothingTimeConstant=0;
+  const src=audioCtx.createMediaStreamSource(stream);
   src.connect(analyser);
-  smoothedDb = DB_FLOOR;             // metre sıfırdan başlasın
-  micActive = true; micPaused = false;
-  document.getElementById('mic-btn').textContent = '⏹ Durdur';
-  document.getElementById('mic-panel').style.display = 'block';
-  document.getElementById('mic-denied').style.display = 'none';
-  document.getElementById('mic-status-row').style.display = 'flex';
-  document.getElementById('live-sound-panel').style.display = 'block';
-  document.getElementById('pomo-info-card').style.display = 'none';
+  smoothedDb=DB_FLOOR;
+  micActive=true;micPaused=false;
+  document.getElementById('mic-btn').textContent='⏹ Durdur';
+  document.getElementById('mic-panel').style.display='block';
+  document.getElementById('mic-denied').style.display='none';
+  document.getElementById('mic-status-row').style.display='flex';
+  document.getElementById('live-sound-panel').style.display='block';
+  document.getElementById('pomo-info-card').style.display='none';
   updateThresholdUI();
 }
-
-async function toggleMic() {
-  if (micActive) { stopMic(); return; }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
-    initMic(stream);
-    startQuietTimer();
-    drawDb();
-    startChartLoop();
+async function toggleMic(){
+  if(micActive){stopMic();return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    initMic(stream);startQuietTimer();drawDb();startChartLoop();
     showToast('🎤 Ses ölçer başlatıldı');
-  } catch(e) {
-    document.getElementById('mic-denied').style.display = 'flex';
-  }
+  }catch(e){document.getElementById('mic-denied').style.display='flex';}
 }
-async function startMicAuto() {
-  if (micActive) { if (micPaused) resumeMic(); return; }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
-    initMic(stream);
-    startQuietTimer();
-    drawDb();
-    startChartLoop();
+async function startMicAuto(){
+  if(micActive){if(micPaused)resumeMic();return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    initMic(stream);startQuietTimer();drawDb();startChartLoop();
     showToast('🎤 Ses ölçer otomatik başlatıldı');
-  } catch(e) {
-    document.getElementById('mic-denied').style.display = 'flex';
-  }
+  }catch(e){document.getElementById('mic-denied').style.display='flex';}
 }
-function stopMic() {
-  micActive = false; micPaused = false; dbRafRunning = false;
-  if (rafId) cancelAnimationFrame(rafId);
-  if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
+function stopMic(){
+  micActive=false;micPaused=false;dbRafRunning=false;
+  if(rafId)cancelAnimationFrame(rafId);
+  if(chartAnimFrame)cancelAnimationFrame(chartAnimFrame);
   clearInterval(quietTimer);
-  if (micStream) micStream.getTracks().forEach(t => t.stop());
-  if (audioCtx) audioCtx.close();
-  dbHistory = [];
-  document.getElementById('mic-btn').textContent = '🎤 Mikrofonu Başlat';
-  document.getElementById('mic-panel').style.display = 'none';
-  document.getElementById('mic-status-row').style.display = 'none';
-  document.getElementById('live-sound-panel').style.display = 'none';
-  document.getElementById('pomo-info-card').style.display = 'block';
-  document.removeEventListener('visibilitychange', syncQuietTimer);
+  if(micStream)micStream.getTracks().forEach(t=>t.stop());
+  if(audioCtx)audioCtx.close();
+  dbHistory=[];quietHistory=[];
+  stopConversation();
+  document.getElementById('mic-btn').textContent='🎤 Mikrofonu Başlat';
+  document.getElementById('mic-panel').style.display='none';
+  document.getElementById('mic-status-row').style.display='none';
+  document.getElementById('live-sound-panel').style.display='none';
+  document.getElementById('pomo-info-card').style.display='block';
+  document.removeEventListener('visibilitychange',syncQuietTimer);
 }
-function pauseMic() {
-  if (!micActive || micPaused) return;
-  micPaused = true; dbRafRunning = false;
-  if (rafId) cancelAnimationFrame(rafId);
-  if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
+function pauseMic(){
+  if(!micActive||micPaused)return;
+  micPaused=true;dbRafRunning=false;
+  if(rafId)cancelAnimationFrame(rafId);
+  if(chartAnimFrame)cancelAnimationFrame(chartAnimFrame);
   clearInterval(quietTimer);
-  document.getElementById('live-dot').style.cssText = 'width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0;';
-  document.getElementById('live-pause-btn').textContent = '▶ Devam Et';
-  document.getElementById('mic-pause-btn').textContent = '▶ Devam Et';
-  document.getElementById('mic-status-lbl').textContent = 'Ses ölçer duraklatıldı';
-  document.getElementById('mic-status-dot').style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;';
+  document.getElementById('live-dot').style.cssText='width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0;';
+  document.getElementById('live-pause-btn').textContent='▶ Devam Et';
+  document.getElementById('mic-pause-btn').textContent='▶ Devam Et';
+  document.getElementById('mic-status-lbl').textContent='Ses ölçer duraklatıldı';
+  document.getElementById('mic-status-dot').style.cssText='width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;';
   showToast('⏸ Ses ölçer duraklatıldı');
 }
-function resumeMic() {
-  if (!micActive || !micPaused) return;
-  micPaused = false;
-  document.getElementById('live-dot').style.cssText = 'width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;flex-shrink:0;';
-  document.getElementById('live-pause-btn').textContent = '⏸ Durdur';
-  document.getElementById('mic-pause-btn').textContent = '⏸ Geçici Durdur';
-  document.getElementById('mic-status-lbl').textContent = 'Ses ölçer aktif';
-  document.getElementById('mic-status-dot').style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;';
-  startQuietTimer();
-  drawDb();
-  startChartLoop();
+function resumeMic(){
+  if(!micActive||!micPaused)return;
+  micPaused=false;
+  document.getElementById('live-dot').style.cssText='width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;flex-shrink:0;';
+  document.getElementById('live-pause-btn').textContent='⏸ Durdur';
+  document.getElementById('mic-pause-btn').textContent='⏸ Geçici Durdur';
+  document.getElementById('mic-status-lbl').textContent='Ses ölçer aktif';
+  document.getElementById('mic-status-dot').style.cssText='width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 1.5s infinite;';
+  startQuietTimer();drawDb();startChartLoop();
   showToast('▶ Ses ölçer devam ediyor');
 }
-function toggleMicPause() { if (micPaused) resumeMic(); else pauseMic(); }
+function toggleMicPause(){if(micPaused)resumeMic();else pauseMic();}
 
-// ─── Animasyon döngüsü: dB metreyi güncelle ────────────
-function drawDb() {
-  if (!micActive || micPaused) { dbRafRunning = false; return; }
-  dbRafRunning = true;
-  currentDb = getSmoothedDb();
+// ── Animasyon döngüsü ──────────────────────────────────
+let consecutiveLoudFrames=0;
+function drawDb(){
+  if(!micActive||micPaused){dbRafRunning=false;return;}
+  dbRafRunning=true;
+  currentDb=getSmoothedDb();
   pushDbHistory(currentDb);
-
-  const pct     = dbToPercent(currentDb);
-  const isLoud  = currentDb > dbThreshold;
-  const color   = isLoud ? 'var(--red)' : 'var(--accent)';
-  const dbText  = Math.round(currentDb) + ' dBFS';
-
-  // Ana sekme
-  const display = document.getElementById('db-display');
-  const bar     = document.getElementById('db-bar');
-  if (display) { display.textContent = dbText; display.className = 'db-value ' + (isLoud ? 'loud' : 'ok'); }
-  if (bar)     { bar.style.width = pct + '%'; bar.style.background = color; }
-  const lbl = document.getElementById('db-label-text');
-  if (lbl) lbl.textContent = (isLoud ? 'Gürültülü' : 'Sessiz') + ' (eşik: ' + dbThreshold + ' dBFS)';
-
-  // Canlı panel
-  const liveBar = document.getElementById('live-db-bar');
-  const liveVal = document.getElementById('live-db-val');
-  if (liveBar) { liveBar.style.width = pct + '%'; liveBar.style.background = color; }
-  if (liveVal) { liveVal.textContent = Math.round(currentDb); liveVal.style.color = color; }
-
-  if (isLoud) onLoud(); else onQuietFrame();
-  rafId = requestAnimationFrame(drawDb);
+  const pct=dbToPercent(currentDb);
+  const isLoud=currentDb>dbThreshold;
+  const color=isLoud?'var(--red)':'var(--accent)';
+  const dbText=Math.round(currentDb)+' dBFS';
+  const display=document.getElementById('db-display');
+  const bar=document.getElementById('db-bar');
+  if(display){display.textContent=dbText;display.className='db-value '+(isLoud?'loud':'ok');}
+  if(bar){bar.style.width=pct+'%';bar.style.background=color;}
+  const lbl=document.getElementById('db-label-text');
+  if(lbl)lbl.textContent=(isLoud?'Gürültülü':'Sessiz')+' (eşik: '+dbThreshold+' dBFS)';
+  const liveBar=document.getElementById('live-db-bar');
+  const liveVal=document.getElementById('live-db-val');
+  if(liveBar){liveBar.style.width=pct+'%';liveBar.style.background=color;}
+  if(liveVal){liveVal.textContent=Math.round(currentDb);liveVal.style.color=color;}
+  if(isLoud){
+    consecutiveLoudFrames++;
+    if(consecutiveLoudFrames===15){
+      const loudEl=document.getElementById('loud-alert');
+      const liveLoud=document.getElementById('live-loud-alert');
+      if(loudEl){loudEl.style.display='flex';document.getElementById('loud-alert-text').textContent='📢 Gürültü algılandı ('+Math.round(currentDb)+' dBFS)!';}
+      if(liveLoud){liveLoud.style.display='flex';document.getElementById('live-loud-text').textContent='📢 Gürültü ('+Math.round(currentDb)+' dBFS)';}
+      clearTimeout(loudTimeout);
+      loudTimeout=setTimeout(()=>{
+        if(loudEl)loudEl.style.display='none';
+        if(liveLoud)liveLoud.style.display='none';
+      },3500);
+    }
+  }else{consecutiveLoudFrames=0;}
+  rafId=requestAnimationFrame(drawDb);
 }
-
-let consecutiveLoudFrames = 0;
-function onLoud() {
-  consecutiveLoudFrames++;
-  if (consecutiveLoudFrames === 15) { // ~0.25 saniye sürekli gürültü
-    const loudEl   = document.getElementById('loud-alert');
-    const liveLoud = document.getElementById('live-loud-alert');
-    if (loudEl)   { loudEl.style.display = 'flex';   document.getElementById('loud-alert-text').textContent = '📢 Gürültü algılandı (' + Math.round(currentDb) + ' dBFS)!'; }
-    if (liveLoud) { liveLoud.style.display = 'flex'; document.getElementById('live-loud-text').textContent  = '📢 Gürültü (' + Math.round(currentDb) + ' dBFS)'; }
-    clearTimeout(loudTimeout);
-    loudTimeout = setTimeout(() => {
-      if (loudEl)   loudEl.style.display   = 'none';
-      if (liveLoud) liveLoud.style.display = 'none';
-    }, 3500);
-  }
-}
-function onQuietFrame() { consecutiveLoudFrames = 0; }
-
-// Ekran açılınca RAF'ı yeniden başlat
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && micActive && !micPaused && !dbRafRunning) {
-    drawDb();
-    startChartLoop();
-  }
-  if (document.visibilityState === 'visible' && running) {
-    const elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
-    timeLeft = Math.max(0, timeLeftAtStart - elapsed);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&micActive&&!micPaused&&!dbRafRunning){drawDb();startChartLoop();}
+  if(document.visibilityState==='visible'&&running){
+    const elapsed=Math.floor((Date.now()-timerStartedAt)/1000);
+    timeLeft=Math.max(0,timeLeftAtStart-elapsed);
     updateTimerDisplay();
-    if (timeLeft <= 0) tick();
+    if(timeLeft<=0)tick();
   }
 });
 
-// ─── 40 dk Grafik ──────────────────────────────────────
-const DB_HISTORY_MAX = 40 * 60; // saniye
-let dbHistory = [];
-function pushDbHistory(db) {
-  const now = Date.now();
-  dbHistory.push({db, ts: now});
-  const cutoff = now - DB_HISTORY_MAX * 1000;
-  while (dbHistory.length > 0 && dbHistory[0].ts < cutoff) dbHistory.shift();
+// ── Grafik ────────────────────────────────────────────
+const DB_HISTORY_MAX=40*60;
+let dbHistory=[];
+function pushDbHistory(db){
+  const now=Date.now();
+  dbHistory.push({db,ts:now});
+  const cutoff=now-DB_HISTORY_MAX*1000;
+  while(dbHistory.length>0&&dbHistory[0].ts<cutoff)dbHistory.shift();
 }
-function tsToX(ts, now, windowMs, W) {
-  return ((ts - (now - windowMs)) / windowMs) * W;
+function tsToX(ts,now,windowMs,W){return((ts-(now-windowMs))/windowMs)*W;}
+function drawDbChart(){
+  const canvas=document.getElementById('db-chart');
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth,H=90;
+  if(canvas.width!==W*dpr){canvas.width=W*dpr;canvas.height=H*dpr;}
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const tY=dbToY(dbThreshold,H);
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#EF9F27';ctx.lineWidth=1.5;ctx.globalAlpha=0.75;
+  ctx.beginPath();ctx.moveTo(0,tY);ctx.lineTo(W,tY);ctx.stroke();
+  ctx.setLineDash([]);ctx.globalAlpha=1;
+  const tlbl=document.getElementById('chart-threshold-lbl');
+  if(tlbl){tlbl.style.top=Math.max(4,tY-10)+'px';tlbl.textContent=dbThreshold+' dBFS';}
+  if(dbHistory.length<2)return;
+  const now=Date.now(),windowMs=DB_HISTORY_MAX*1000;
+  ctx.beginPath();let started=false;
+  for(let i=0;i<dbHistory.length;i++){
+    const x=tsToX(dbHistory[i].ts,now,windowMs,W),y=dbToY(dbHistory[i].db,H);
+    if(!started){ctx.moveTo(x,H);ctx.lineTo(x,y);started=true;}else ctx.lineTo(x,y);
+  }
+  const lastX=tsToX(dbHistory[dbHistory.length-1].ts,now,windowMs,W);
+  ctx.lineTo(lastX,H);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(226,75,74,0.50)');
+  grad.addColorStop(0.5,'rgba(239,159,39,0.30)');
+  grad.addColorStop(1,'rgba(93,202,165,0.20)');
+  ctx.fillStyle=grad;ctx.fill();
+  for(let i=1;i<dbHistory.length;i++){
+    const x0=tsToX(dbHistory[i-1].ts,now,windowMs,W),y0=dbToY(dbHistory[i-1].db,H);
+    const x1=tsToX(dbHistory[i].ts,now,windowMs,W),y1=dbToY(dbHistory[i].db,H);
+    ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);
+    ctx.strokeStyle=((dbHistory[i-1].db+dbHistory[i].db)/2>dbThreshold)?'#E24B4A':'#5DCAA5';
+    ctx.lineWidth=1.5;ctx.globalAlpha=0.9;ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  const last=dbHistory[dbHistory.length-1];
+  const lx=tsToX(last.ts,now,windowMs,W),ly=dbToY(last.db,H);
+  ctx.beginPath();ctx.arc(lx,ly,3,0,Math.PI*2);
+  ctx.fillStyle=last.db>dbThreshold?'#E24B4A':'#1D9E75';ctx.fill();
 }
-function drawDbChart() {
-  const canvas = document.getElementById('db-chart');
-  if (!canvas) return;
-  const dpr = window.devicePixelRatio || 1;
-  const W   = canvas.offsetWidth;
-  const H   = 90;
-  if (canvas.width !== W * dpr) { canvas.width = W * dpr; canvas.height = H * dpr; }
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, W, H);
-
-  // Eşik çizgisi
-  const tY = dbToY(dbThreshold, H);
-  ctx.setLineDash([4, 4]);
-  ctx.strokeStyle = '#EF9F27';
-  ctx.lineWidth = 1.5;
-  ctx.globalAlpha = 0.75;
-  ctx.beginPath(); ctx.moveTo(0, tY); ctx.lineTo(W, tY); ctx.stroke();
-  ctx.setLineDash([]); ctx.globalAlpha = 1;
-  const tlbl = document.getElementById('chart-threshold-lbl');
-  if (tlbl) { tlbl.style.top = Math.max(4, tY - 10) + 'px'; tlbl.textContent = dbThreshold + ' dBFS'; }
-
-  if (dbHistory.length < 2) return;
-  const now = Date.now();
-  const windowMs = DB_HISTORY_MAX * 1000;
-
-  // Dolgu alanı
-  ctx.beginPath();
-  let started = false;
-  for (let i = 0; i < dbHistory.length; i++) {
-    const x = tsToX(dbHistory[i].ts, now, windowMs, W);
-    const y = dbToY(dbHistory[i].db, H);
-    if (!started) { ctx.moveTo(x, H); ctx.lineTo(x, y); started = true; }
-    else ctx.lineTo(x, y);
-  }
-  const lastX = tsToX(dbHistory[dbHistory.length - 1].ts, now, windowMs, W);
-  ctx.lineTo(lastX, H);
-  ctx.closePath();
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0,   'rgba(226,75,74,0.50)');
-  grad.addColorStop(0.5, 'rgba(239,159,39,0.30)');
-  grad.addColorStop(1,   'rgba(93,202,165,0.20)');
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // Renk segmentli çizgi
-  for (let i = 1; i < dbHistory.length; i++) {
-    const x0 = tsToX(dbHistory[i-1].ts, now, windowMs, W);
-    const y0 = dbToY(dbHistory[i-1].db, H);
-    const x1 = tsToX(dbHistory[i].ts, now, windowMs, W);
-    const y1 = dbToY(dbHistory[i].db, H);
-    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
-    ctx.strokeStyle = ((dbHistory[i-1].db + dbHistory[i].db) / 2 > dbThreshold) ? '#E24B4A' : '#5DCAA5';
-    ctx.lineWidth = 1.5; ctx.globalAlpha = 0.9; ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-
-  // Canlı nokta
-  const last = dbHistory[dbHistory.length - 1];
-  const lx = tsToX(last.ts, now, windowMs, W);
-  const ly = dbToY(last.db, H);
-  ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI * 2);
-  ctx.fillStyle = last.db > dbThreshold ? '#E24B4A' : '#1D9E75';
-  ctx.fill();
-}
-function startChartLoop() {
-  if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
-  function loop() {
-    if (!micActive || micPaused) return;
-    drawDbChart();
-    chartAnimFrame = requestAnimationFrame(loop);
-  }
+function startChartLoop(){
+  if(chartAnimFrame)cancelAnimationFrame(chartAnimFrame);
+  function loop(){if(!micActive||micPaused)return;drawDbChart();chartAnimFrame=requestAnimationFrame(loop);}
   loop();
 }
 
-// ─── Sessizlik sayacı ───────────────────────────────────
-let loudSeconds = 0;
-let beepCooldown = false;
-let quietTimerStartAt = null;
-let quietSecAtStart = 0, totalMicSecAtStart = 0;
-
-function startQuietTimer() {
+// ── Sessizlik sayacı ───────────────────────────────────
+let loudSeconds=0,beepCooldown=false;
+let quietTimerStartAt=null,quietSecAtStart=0,totalMicSecAtStart=0;
+function startQuietTimer(){
   clearInterval(quietTimer);
-  // quietSeconds / totalMicSeconds SIFIRLANMAZ — storage'dan gelen birikim korunur
-  loudSeconds = 0;
-  starSecondsLeft = starIntervalMin * 60;
-  quietTimerStartAt = Date.now();
-  quietSecAtStart = quietSeconds;
-  totalMicSecAtStart = totalMicSeconds;
-
-  quietTimer = setInterval(() => {
-    if (!micActive || micPaused) return;
+  loudSeconds=0;starSecondsLeft=starIntervalMin*60;
+  quietTimerStartAt=Date.now();
+  quietSecAtStart=quietSeconds;totalMicSecAtStart=totalMicSeconds;
+  quietTimer=setInterval(()=>{
+    if(!micActive||micPaused)return;
     totalMicSeconds++;
-    if (currentDb <= dbThreshold) {
-      quietSeconds++;
-      loudSeconds = 0;
+    if(currentDb<=dbThreshold){
+      quietSeconds++;loudSeconds=0;
       starSecondsLeft--;
-      if (starSecondsLeft <= 0) {
-        awardStar();
-        starSecondsLeft = starIntervalMin * 60;
-      }
+      if(starSecondsLeft<=0){awardStar();starSecondsLeft=starIntervalMin*60;}
       updateStarCountdown();
-    } else {
+    }else{
       loudSeconds++;
-      if (loudSeconds >= 3 && !beepCooldown) {
-  const beepCount = loudSeconds >= 7 ? 4 : 3;
-  playBeep(beepCount);
-  beepCooldown = true;
-  setTimeout(() => beepCooldown = false, 4000);
-}
+      if(loudSeconds>=3&&!beepCooldown){
+        const count=loudSeconds>=7?4:3;
+        playBeep(count);
+        beepCooldown=true;
+        setTimeout(()=>beepCooldown=false,4000);
+      }
     }
-    autoSaveToday();
-    updateLiveRatio();
-  }, 1000);
-
-  document.removeEventListener('visibilitychange', syncQuietTimer);
-  document.addEventListener('visibilitychange', syncQuietTimer);
+    autoSaveToday();updateLiveRatio();
+  },1000);
+  document.removeEventListener('visibilitychange',syncQuietTimer);
+  document.addEventListener('visibilitychange',syncQuietTimer);
 }
-function syncQuietTimer() {
-  if (document.visibilityState === 'visible' && micActive && !micPaused && quietTimerStartAt) {
-    const elapsed = Math.floor((Date.now() - quietTimerStartAt) / 1000);
-    totalMicSeconds = totalMicSecAtStart + elapsed;
+function syncQuietTimer(){
+  if(document.visibilityState==='visible'&&micActive&&!micPaused&&quietTimerStartAt){
+    const elapsed=Math.floor((Date.now()-quietTimerStartAt)/1000);
+    totalMicSeconds=totalMicSecAtStart+elapsed;
     updateLiveRatio();
   }
 }
-function updateLiveRatio() {
-  if (totalMicSeconds === 0) return;
-  const ratio = Math.round(quietSeconds / totalMicSeconds * 100);
-  const qm = Math.floor(quietSeconds / 60), qs = quietSeconds % 60;
-  const tm = Math.floor(totalMicSeconds / 60), ts = totalMicSeconds % 60;
-  const badge  = document.getElementById('live-ratio-badge');
-  const bar    = document.getElementById('live-ratio-bar');
-  const lbl    = document.getElementById('live-ratio-label');
-  const detail = document.getElementById('live-ratio-detail');
-  const qt     = document.getElementById('live-quiet-time');
-  const tt     = document.getElementById('live-total-time');
-  const color  = ratio >= 75 ? 'var(--accent-dark)' : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
-  const bgClr  = ratio >= 75 ? 'var(--accent)'      : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
-  if (badge)  { badge.textContent = ratio + '%'; badge.style.color = color; }
-  if (bar)    { bar.style.width = ratio + '%'; bar.style.background = bgClr; }
-  if (lbl)    { lbl.textContent = ratio >= 90 ? '🏆 Odak Ustası!' : ratio >= 75 ? '🥇 Harika!' : ratio >= 60 ? '🥈 İyi gidiyorsun' : ratio >= 45 ? '🥉 Biraz daha sessiz ol' : '🌱 Gelişmeye devam'; }
-  if (detail) { detail.textContent = pad(qm) + ':' + pad(qs) + ' / ' + pad(tm) + ':' + pad(ts); }
-  if (qt)     { qt.textContent = pad(qm) + ':' + pad(qs); }
-  if (tt)     { tt.textContent = pad(tm) + ':' + pad(ts); }
+function updateLiveRatio(){
+  if(totalMicSeconds===0)return;
+  quietHistory.push(currentDb<=dbThreshold);
+  if(quietHistory.length>RATIO_WINDOW)quietHistory.shift();
+  const quietCount=quietHistory.filter(Boolean).length;
+  const ratio=Math.round(quietCount/quietHistory.length*100);
+  const qm=Math.floor(quietSeconds/60),qs=quietSeconds%60;
+  const tm=Math.floor(totalMicSeconds/60),ts=totalMicSeconds%60;
+  const color=ratio>=75?'var(--accent-dark)':ratio>=50?'var(--amber)':'var(--red)';
+  const bgClr=ratio>=75?'var(--accent)':ratio>=50?'var(--amber)':'var(--red)';
+  const badge=document.getElementById('live-ratio-badge');
+  const bar=document.getElementById('live-ratio-bar');
+  const lbl=document.getElementById('live-ratio-label');
+  const detail=document.getElementById('live-ratio-detail');
+  const qt=document.getElementById('live-quiet-time');
+  const tt=document.getElementById('live-total-time');
+  if(badge){badge.textContent=ratio+'%';badge.style.color=color;}
+  if(bar){bar.style.width=ratio+'%';bar.style.background=bgClr;}
+  if(lbl){
+    const info=ratio>=90?'🏆 Odak Ustası!':ratio>=75?'🥇 Harika!':ratio>=60?'🥈 İyi gidiyorsun':ratio>=45?'🥉 Biraz daha sessiz ol':'🌱 Gelişmeye devam';
+    lbl.textContent=info+' (son 5 dk)';
+  }
+  if(detail)detail.textContent=pad(qm)+':'+pad(qs)+' / '+pad(tm)+':'+pad(ts);
+  if(qt)qt.textContent=pad(qm)+':'+pad(qs);
+  if(tt)tt.textContent=pad(tm)+':'+pad(ts);
 }
 
-// ─── Yıldız sistemi ────────────────────────────────────
-function awardStar() {
-  const row = document.getElementById('star-row');
-  const placeholder = row.querySelector('span:not(.star)');
-  if (placeholder) placeholder.remove();
-  const star = document.createElement('span');
-  star.className = 'star'; star.textContent = '⭐';
+// ── Yıldız ────────────────────────────────────────────
+function awardStar(){
+  const row=document.getElementById('star-row');
+  const placeholder=row.querySelector('span:not(.star)');
+  if(placeholder)placeholder.remove();
+  const star=document.createElement('span');
+  star.className='star';star.textContent='⭐';
   row.appendChild(star);
-  const count = row.querySelectorAll('.star').length;
-  document.getElementById('star-total-label').textContent = count + ' ⭐';
-  showToast('⭐ Yıldız kazandın! Toplam: ' + count);
+  const count=row.querySelectorAll('.star').length;
+  document.getElementById('star-total-label').textContent=count+' ⭐';
+  showToast('⭐ Yıldız kazandın! Toplam: '+count);
 }
-function updateStarCountdown() {
-  const m = Math.floor(starSecondsLeft / 60);
-  const s = starSecondsLeft % 60;
-  const el  = document.getElementById('star-timer-val');
-  const bar = document.getElementById('star-progress');
-  if (el)  el.textContent = pad(m) + ':' + pad(s);
-  if (bar) bar.style.width = ((starIntervalMin * 60 - starSecondsLeft) / (starIntervalMin * 60) * 100) + '%';
+function updateStarCountdown(){
+  const m=Math.floor(starSecondsLeft/60),s=starSecondsLeft%60;
+  const el=document.getElementById('star-timer-val');
+  const bar=document.getElementById('star-progress');
+  if(el)el.textContent=pad(m)+':'+pad(s);
+  if(bar)bar.style.width=((starIntervalMin*60-starSecondsLeft)/(starIntervalMin*60)*100)+'%';
+}
+
+// ── Konuşma modu ──────────────────────────────────────
+function startConversation(minutes){
+  conversationMode=true;
+  conversationSecondsLeft=minutes*60;
+  document.getElementById('conversation-bar').style.display='block';
+  clearInterval(conversationInterval);
+  const el=document.getElementById('conv-countdown');
+  if(el)el.textContent=pad(minutes)+':00';
+  conversationInterval=setInterval(()=>{
+    conversationSecondsLeft--;
+    const m=Math.floor(conversationSecondsLeft/60),s=conversationSecondsLeft%60;
+    if(el)el.textContent=pad(m)+':'+pad(s);
+    if(conversationSecondsLeft<=0)stopConversation();
+  },1000);
+  showToast('💬 '+minutes+' dk konuşma modu başladı');
+}
+function stopConversation(){
+  conversationMode=false;
+  clearInterval(conversationInterval);
+  const bar=document.getElementById('conversation-bar');
+  if(bar)bar.style.display='none';
 }
 
 // ═══════════════════════════════════════════════════════
 //  SES EFEKTLERİ
 // ═══════════════════════════════════════════════════════
-
-// Gürültü uyarı beep'i
-let beepCtx = null;
-function playBeep() {
-  try {
-    if (!beepCtx) beepCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Üç kısa bip arka arkaya — daha dikkat çekici
-    const times = [0, 0.18, 0.36];
-    times.forEach(delay => {
-      const osc  = beepCtx.createOscillator();
-      const gain = beepCtx.createGain();
-      osc.connect(gain); gain.connect(beepCtx.destination);
-      osc.type = 'square'; // sine yerine square — daha keskin ve yüksek algılanan ses
-      osc.frequency.value = 880;
-      const st = beepCtx.currentTime + delay;
-      gain.gain.setValueAtTime(0.6, st);          // 0.25'ten 0.6'ya çıkardık
-      gain.gain.exponentialRampToValueAtTime(0.001, st + 0.12);
-      osc.start(st); osc.stop(st + 0.13);
+let beepCtx=null;
+function playBeep(count=3){
+  if(conversationMode)return;
+  try{
+    if(!beepCtx)beepCtx=new(window.AudioContext||window.webkitAudioContext)();
+    Array.from({length:count}).forEach((_,i)=>{
+      const osc=beepCtx.createOscillator(),gain=beepCtx.createGain();
+      osc.connect(gain);gain.connect(beepCtx.destination);
+      osc.type='square';osc.frequency.value=880;
+      const st=beepCtx.currentTime+i*0.18;
+      gain.gain.setValueAtTime(0.6,st);
+      gain.gain.exponentialRampToValueAtTime(0.001,st+0.12);
+      osc.start(st);osc.stop(st+0.13);
     });
-  } catch(e) {}
+  }catch(e){}
 }
-
-let alarmCtx = null;
-
-function stopAlarm() {
-  if (alarmCtx) { alarmCtx.close(); alarmCtx = null; }
+function playFocusBeep(){
+  try{
+    if(!beepCtx)beepCtx=new(window.AudioContext||window.webkitAudioContext)();
+    [{f:880,t:0.0},{f:740,t:0.35},{f:587,t:0.70}].forEach(({f,t})=>{
+      const osc=beepCtx.createOscillator(),gain=beepCtx.createGain();
+      osc.connect(gain);gain.connect(beepCtx.destination);
+      osc.type='square';osc.frequency.value=f;
+      const st=beepCtx.currentTime+t;
+      gain.gain.setValueAtTime(0.5,st);
+      gain.gain.exponentialRampToValueAtTime(0.001,st+0.28);
+      osc.start(st);osc.stop(st+0.3);
+    });
+  }catch(e){}
 }
-
-function playAlarm(type) {
-  stopAlarm(); // önceki varsa durdur
-  try {
-    alarmCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const master = alarmCtx.createGain();
-    master.gain.value = 0.4;
-    master.connect(alarmCtx.destination);
-
-    const seq = type === 'work'
-      ? [{f:523,d:0.18,t:0.0},{f:659,d:0.18,t:0.20},{f:784,d:0.18,t:0.40},{f:1047,d:0.35,t:0.60},{f:1047,d:0.35,t:1.05}]
-      : [{f:784,d:0.22,t:0.0},{f:659,d:0.22,t:0.28},{f:523,d:0.40,t:0.56}];
-
-    const seqLen = type === 'work' ? 1.6 : 1.2; // bir tekrarın süresi (sn)
-    const gap    = 0.25; // tekrarlar arası sessizlik
-
-    for (let rep = 0; rep < 20; rep++) {
-      const offset = rep * (seqLen + gap);
-      seq.forEach(({f, d, t}) => {
-        const osc  = alarmCtx.createOscillator();
-        const gain = alarmCtx.createGain();
-        osc.connect(gain); gain.connect(master);
-        osc.type = 'sine'; osc.frequency.value = f;
-        const st = alarmCtx.currentTime + offset + t;
-        gain.gain.setValueAtTime(0, st);
-        gain.gain.linearRampToValueAtTime(1, st + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.001, st + d + 0.1);
-        osc.start(st); osc.stop(st + d + 0.15);
+let alarmCtx=null;
+function stopAlarm(){if(alarmCtx){alarmCtx.close();alarmCtx=null;}}
+function playAlarm(type){
+  stopAlarm();
+  try{
+    alarmCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const master=alarmCtx.createGain();master.gain.value=0.4;master.connect(alarmCtx.destination);
+    const seq=type==='work'
+      ?[{f:523,d:0.18,t:0.0},{f:659,d:0.18,t:0.20},{f:784,d:0.18,t:0.40},{f:1047,d:0.35,t:0.60},{f:1047,d:0.35,t:1.05}]
+      :[{f:784,d:0.22,t:0.0},{f:659,d:0.22,t:0.28},{f:523,d:0.40,t:0.56}];
+    const seqLen=type==='work'?1.6:1.2,gap=0.25;
+    for(let rep=0;rep<20;rep++){
+      const offset=rep*(seqLen+gap);
+      seq.forEach(({f,d,t})=>{
+        const osc=alarmCtx.createOscillator(),gain=alarmCtx.createGain();
+        osc.connect(gain);gain.connect(master);
+        osc.type='sine';osc.frequency.value=f;
+        const st=alarmCtx.currentTime+offset+t;
+        gain.gain.setValueAtTime(0,st);
+        gain.gain.linearRampToValueAtTime(1,st+0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001,st+d+0.1);
+        osc.start(st);osc.stop(st+d+0.15);
       });
     }
-
-    // Herhangi bir yere tıklayınca durdur
-    document.addEventListener('click', stopAlarm, { once: true });
-
-  } catch(e) {}
+    document.addEventListener('click',stopAlarm,{once:true});
+  }catch(e){}
 }
 
 // ═══════════════════════════════════════════════════════
 //  STORAGE
 // ═══════════════════════════════════════════════════════
-const STORE_KEY = 'duru_lgs_v4';
-function loadData() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; } }
-function saveData(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch {} }
-function pad(n) { return String(n).padStart(2, '0'); }
-function todayKey() { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
-function loadToday() {
-  const data = loadData(), key = todayKey();
-  if (data[key]) {
-    const s = data[key];
-    subjects.forEach((sub, i) => { sub.done = s.subjects[i] || 0; });
-    pomosDone      = s.pomos || 0;
-    quietSeconds   = s.quietSec || 0;
-    totalMicSeconds= s.totalMicSec || 0;
+const STORE_KEY='duru_lgs_v4';
+function loadData(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch{return {};}}
+function saveData(d){try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}catch{}}
+function pad(n){return String(n).padStart(2,'0');}
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function loadToday(){
+  const data=loadData(),key=todayKey();
+  if(data[key]){
+    const s=data[key];
+    subjects.forEach((sub,i)=>{sub.done=s.subjects[i]||0;});
+    pomosDone=s.pomos||0;quietSeconds=s.quietSec||0;totalMicSeconds=s.totalMicSec||0;
     updateDots();
   }
 }
-function autoSaveToday() {
-  const data = loadData(), key = todayKey();
-  const ratio = totalMicSeconds > 0 ? Math.round(quietSeconds / totalMicSeconds * 100) : null;
-  data[key] = {
-    date: key, subjects: subjects.map(s => s.done),
-    pomos: pomosDone, total: subjects.reduce((a, s) => a + s.done, 0),
-    quietSec: quietSeconds, totalMicSec: totalMicSeconds, quietRatio: ratio,
-  };
+function autoSaveToday(){
+  const data=loadData(),key=todayKey();
+  const ratio=totalMicSeconds>0?Math.round(quietSeconds/totalMicSeconds*100):null;
+  data[key]={date:key,subjects:subjects.map(s=>s.done),pomos:pomosDone,
+    total:subjects.reduce((a,s)=>a+s.done,0),quietSec:quietSeconds,
+    totalMicSec:totalMicSeconds,quietRatio:ratio};
   saveData(data);
 }
 
 // ═══════════════════════════════════════════════════════
-//  SEKME
+//  UI
 // ═══════════════════════════════════════════════════════
-function showTab(name, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (el) el.classList.add('active');
-  if (name === 'istatistik') renderStats();
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+  if(name==='istatistik')renderStats();
 }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
 
 // ═══════════════════════════════════════════════════════
 //  TIMER
 // ═══════════════════════════════════════════════════════
-function setMode(mode) {
-  clearInterval(timerInterval); clearInterval(alertInterval);
-  running = false;
-  document.getElementById('start-btn').textContent = '▶ Başlat';
-  document.getElementById('mode-work').classList.toggle('active', mode === 'work');
-  document.getElementById('mode-break').classList.toggle('active', mode === 'break');
-  if (mode === 'work') {
-    isBreak = false; timeLeft = WORK_MIN * 60; totalTime = WORK_MIN * 60;
-    document.getElementById('timer-sub').textContent = 'Çalışma süresi · 4 tur hedefi';
-  } else {
-    isBreak = true; timeLeft = BREAK_MIN * 60; totalTime = BREAK_MIN * 60;
-    document.getElementById('timer-sub').textContent = 'Mola · Dinlen!';
-    if (micActive && !micPaused) pauseMic();
+function setMode(mode){
+  clearInterval(timerInterval);clearInterval(alertInterval);
+  running=false;
+  document.getElementById('start-btn').textContent='▶ Başlat';
+  document.getElementById('mode-work').classList.toggle('active',mode==='work');
+  document.getElementById('mode-break').classList.toggle('active',mode==='break');
+  if(mode==='work'){
+    isBreak=false;timeLeft=WORK_MIN*60;totalTime=WORK_MIN*60;
+    document.getElementById('timer-sub').textContent='Çalışma süresi · 4 tur hedefi';
+  }else{
+    isBreak=true;timeLeft=BREAK_MIN*60;totalTime=BREAK_MIN*60;
+    document.getElementById('timer-sub').textContent='Mola · Dinlen!';
+    if(micActive&&!micPaused)pauseMic();
   }
   updateTimerDisplay();
 }
-function updateTimerDisplay() {
-  document.getElementById('timer-display').textContent = pad(Math.floor(timeLeft / 60)) + ':' + pad(timeLeft % 60);
-  document.getElementById('timer-progress').style.width = (timeLeft / totalTime * 100) + '%';
+function updateTimerDisplay(){
+  document.getElementById('timer-display').textContent=pad(Math.floor(timeLeft/60))+':'+pad(timeLeft%60);
+  document.getElementById('timer-progress').style.width=(timeLeft/totalTime*100)+'%';
 }
-let timerStartedAt = null, timeLeftAtStart = 0;
-function tick() {
-  if (!running) return;
-  const elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
-  timeLeft = Math.max(0, timeLeftAtStart - elapsed);
+let timerStartedAt=null,timeLeftAtStart=0;
+function tick(){
+  if(!running)return;
+  const elapsed=Math.floor((Date.now()-timerStartedAt)/1000);
+  timeLeft=Math.max(0,timeLeftAtStart-elapsed);
   updateTimerDisplay();
-  if (timeLeft <= 0) {
-    clearInterval(timerInterval); clearInterval(alertInterval);
-    running = false;
-    document.getElementById('start-btn').textContent = '▶ Başlat';
-    if (!isBreak) {
+  if(timeLeft<=0){
+    clearInterval(timerInterval);clearInterval(alertInterval);
+    running=false;document.getElementById('start-btn').textContent='▶ Başlat';
+    if(!isBreak){
       playAlarm('work');
-      pomosDone = Math.min(4, pomosDone + 1); updateDots(); autoSaveToday();
-      document.getElementById('break-alert').style.display = 'flex';
-      setTimeout(() => document.getElementById('break-alert').style.display = 'none', 6000);
+      pomosDone=Math.min(4,pomosDone+1);updateDots();autoSaveToday();
+      document.getElementById('break-alert').style.display='flex';
+      setTimeout(()=>document.getElementById('break-alert').style.display='none',6000);
       showToast('🎉 30 dakika tamamlandı! Mola zamanı.');
       setMode('break');
-    } else {
+    }else{
       playAlarm('break');
       showToast('📚 Mola bitti! Çalışmaya devam.');
       setMode('work');
     }
   }
 }
-function startAlertInterval() {
-  alertInterval = setInterval(() => {
+function startAlertInterval(){
+  alertInterval=setInterval(()=>{
     dalmaCount++;
-    document.getElementById('dalma-count').textContent = dalmaCount;
-    document.getElementById('focus-alert').style.display = 'flex';
+    document.getElementById('dalma-count').textContent=dalmaCount;
+    document.getElementById('focus-alert').style.display='flex';
     showToast('🔔 Duru, neredesin? Odaklan!');
-    setTimeout(() => document.getElementById('focus-alert').style.display = 'none', 5000);
-  }, ALERT_MIN * 60 * 1000);
+    setTimeout(()=>document.getElementById('focus-alert').style.display='none',5000);
+    playFocusBeep();
+  },ALERT_MIN*60*1000);
 }
-function toggleTimer() {
-  if (running) {
-    clearInterval(timerInterval); clearInterval(alertInterval);
-    running = false;
-    timeLeft = Math.max(0, timeLeftAtStart - Math.floor((Date.now() - timerStartedAt) / 1000));
-    document.getElementById('start-btn').textContent = '▶ Devam';
+function toggleTimer(){
+  if(running){
+    clearInterval(timerInterval);clearInterval(alertInterval);
+    running=false;
+    timeLeft=Math.max(0,timeLeftAtStart-Math.floor((Date.now()-timerStartedAt)/1000));
+    document.getElementById('start-btn').textContent='▶ Devam';
     updateTimerDisplay();
-    if (micActive && !micPaused) pauseMic();
-  } else {
-    timerStartedAt = Date.now(); timeLeftAtStart = timeLeft;
-    timerInterval = setInterval(tick, 500);
+    if(micActive&&!micPaused)pauseMic();
+  }else{
+    timerStartedAt=Date.now();timeLeftAtStart=timeLeft;
+    timerInterval=setInterval(tick,500);
     startAlertInterval();
-    running = true;
-    document.getElementById('start-btn').textContent = '⏸ Durdur';
-    if (!isBreak) startMicAuto();
+    running=true;document.getElementById('start-btn').textContent='⏸ Durdur';
+    if(!isBreak)startMicAuto();
   }
 }
-function resetTimer() { setMode(isBreak ? 'break' : 'work'); }
-function updateDots() { document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('done', i < pomosDone)); }
+function resetTimer(){setMode(isBreak?'break':'work');}
+function updateDots(){document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('done',i<pomosDone));}
 
 // ═══════════════════════════════════════════════════════
 //  GÖREVLER
 // ═══════════════════════════════════════════════════════
-function renderSubjects() {
-  const grid = document.getElementById('subject-grid');
-  grid.innerHTML = ''; let totalDone = 0;
-  subjects.forEach((s, i) => {
-    totalDone += s.done;
-    const pct = Math.min(100, Math.round(s.done / s.target * 100));
-    const isDone = s.done >= s.target;
-    const card = document.createElement('div');
-    card.className = 'subject-card';
-    card.innerHTML = `
+function renderSubjects(){
+  const grid=document.getElementById('subject-grid');
+  grid.innerHTML='';let totalDone=0;
+  subjects.forEach((s,i)=>{
+    totalDone+=s.done;
+    const pct=Math.min(100,Math.round(s.done/s.target*100));
+    const isDone=s.done>=s.target;
+    const card=document.createElement('div');card.className='subject-card';
+    card.innerHTML=`
       <div class="subject-header">
         <span class="subject-name">${s.name}</span>
-        <span class="subject-badge ${isDone ? 'done' : ''}">${isDone ? '✓ Tamam' : s.done + '/' + s.target}</span>
+        <span class="subject-badge ${isDone?'done':''}">${isDone?'✓ Tamam':s.done+'/'+s.target}</span>
       </div>
       <div class="subject-pct">${pct}% tamamlandı</div>
       <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${s.color}"></div></div>
@@ -1093,174 +1014,163 @@ function renderSubjects() {
       </div>`;
     grid.appendChild(card);
   });
-  document.getElementById('total-done').textContent = totalDone;
-  document.getElementById('total-pct').textContent = '%' + Math.round(totalDone / (TARGET * SUBJECTS.length) * 100);
+  document.getElementById('total-done').textContent=totalDone;
+  document.getElementById('total-pct').textContent='%'+Math.round(totalDone/(TARGET*SUBJECTS.length)*100);
   autoSaveToday();
 }
-function addQ(i, n) {
-  subjects[i].done = Math.max(0, subjects[i].done + n);
-  if (subjects[i].done >= subjects[i].target) showToast('🎉 ' + subjects[i].name + ' hedefine ulaştın!');
+function addQ(i,n){
+  subjects[i].done=Math.max(0,subjects[i].done+n);
+  if(subjects[i].done>=subjects[i].target)showToast('🎉 '+subjects[i].name+' hedefine ulaştın!');
   renderSubjects();
 }
-function saveDay() { autoSaveToday(); showToast('💾 Bugünün çalışması kaydedildi!'); }
-function resetDay() {
-  if (!confirm('Günü sıfırlamak istediğinden emin misin?')) return;
-  subjects.forEach(s => s.done = 0); pomosDone = 0; updateDots(); renderSubjects();
+function saveDay(){autoSaveToday();showToast('💾 Bugünün çalışması kaydedildi!');}
+function resetDay(){
+  if(!confirm('Günü sıfırlamak istediğinden emin misin?'))return;
+  subjects.forEach(s=>s.done=0);pomosDone=0;updateDots();renderSubjects();
   showToast('🔄 Yeni gün başladı! Hadi başla!');
 }
 
 // ═══════════════════════════════════════════════════════
 //  ODAK
 // ═══════════════════════════════════════════════════════
-function showHint() {
-  detayCount++; document.getElementById('detay-count').textContent = detayCount;
-  const box = document.getElementById('hint-box');
-  box.textContent = hints[Math.floor(Math.random() * hints.length)];
+function showHint(){
+  detayCount++;document.getElementById('detay-count').textContent=detayCount;
+  const box=document.getElementById('hint-box');
+  box.textContent=hints[Math.floor(Math.random()*hints.length)];
   box.classList.add('show');
 }
-function sendFocusAlert() {
-  dalmaCount++; document.getElementById('dalma-count').textContent = dalmaCount;
+function sendFocusAlert(){
+  dalmaCount++;document.getElementById('dalma-count').textContent=dalmaCount;
   showToast('🔔 Neredeyim? Odaklan!');
-  document.getElementById('focus-alert').style.display = 'flex';
-  setTimeout(() => document.getElementById('focus-alert').style.display = 'none', 5000);
+  document.getElementById('focus-alert').style.display='flex';
+  setTimeout(()=>document.getElementById('focus-alert').style.display='none',5000);
 }
-function showMotivation() {
-  motivasyonCount++; document.getElementById('motivasyon-count').textContent = motivasyonCount;
-  const box = document.getElementById('motivasyon-box');
-  box.textContent = motivasyonlar[Math.floor(Math.random() * motivasyonlar.length)];
+function showMotivation(){
+  motivasyonCount++;document.getElementById('motivasyon-count').textContent=motivasyonCount;
+  const box=document.getElementById('motivasyon-box');
+  box.textContent=motivasyonlar[Math.floor(Math.random()*motivasyonlar.length)];
   box.classList.add('show');
 }
 
 // ═══════════════════════════════════════════════════════
 //  İSTATİSTİK
 // ═══════════════════════════════════════════════════════
-function changeWeek(dir) { weekOffset += dir; renderStats(); }
-function getWeekDays(offset) {
-  const today = new Date(), dow = today.getDay();
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
-  return Array.from({length: 7}, (_, i) => {
-    const d = new Date(monday); d.setDate(monday.getDate() + i);
-    const key = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-    return {key, label: DAYS_TR[d.getDay()], date: d};
+function changeWeek(dir){weekOffset+=dir;renderStats();}
+function getWeekDays(offset){
+  const today=new Date(),dow=today.getDay();
+  const monday=new Date(today);
+  monday.setDate(today.getDate()-((dow+6)%7)+offset*7);
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const key=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    return{key,label:DAYS_TR[d.getDay()],date:d};
   });
 }
-function renderStats() {
-  const data = loadData(), days = getWeekDays(weekOffset), todayK = todayKey();
-  const start = days[0].date, end = days[6].date;
-  const fmt = d => pad(d.getDate()) + '/' + pad(d.getMonth() + 1);
-  document.getElementById('week-label').textContent =
-    weekOffset === 0  ? 'Bu Hafta (' + fmt(start) + ' – ' + fmt(end) + ')' :
-    weekOffset === -1 ? 'Geçen Hafta (' + fmt(start) + ' – ' + fmt(end) + ')' :
-    fmt(start) + ' – ' + fmt(end);
-
-  const dailyTotals = days.map(d => data[d.key] ? data[d.key].total : 0);
-  const dailyRatios = days.map(d => data[d.key]?.quietRatio ?? null);
-  const maxVal      = Math.max(...dailyTotals, 10);
-  const weekTotal   = dailyTotals.reduce((a, b) => a + b, 0);
-  const activeDays  = dailyTotals.filter(v => v > 0).length;
-  const weekPomos   = days.reduce((a, d) => a + (data[d.key]?.pomos || 0), 0);
-  const ratioDays   = dailyRatios.filter(r => r !== null);
-  const avgRatio    = ratioDays.length > 0 ? Math.round(ratioDays.reduce((a, b) => a + b, 0) / ratioDays.length) : null;
-
-  // Bar chart
-  const barsEl = document.getElementById('day-bars');
-  barsEl.innerHTML = '';
-  days.forEach((d, i) => {
-    const val = dailyTotals[i], ratio = dailyRatios[i], isToday = d.key === todayK;
-    const pct = Math.round((val / maxVal) * 100);
-    const rColor = ratio === null ? 'var(--text-hint)' : ratio >= 75 ? 'var(--accent-dark)' : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
-    const col = document.createElement('div');
-    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;';
-    col.innerHTML = `
-      <div style="font-size:10px;color:var(--text-sec);font-weight:500;">${val > 0 ? val : ''}</div>
+function renderStats(){
+  const data=loadData(),days=getWeekDays(weekOffset),todayK=todayKey();
+  const start=days[0].date,end=days[6].date;
+  const fmt=d=>pad(d.getDate())+'/'+pad(d.getMonth()+1);
+  document.getElementById('week-label').textContent=
+    weekOffset===0?'Bu Hafta ('+fmt(start)+' – '+fmt(end)+')':
+    weekOffset===-1?'Geçen Hafta ('+fmt(start)+' – '+fmt(end)+')':
+    fmt(start)+' – '+fmt(end);
+  const dailyTotals=days.map(d=>data[d.key]?data[d.key].total:0);
+  const dailyRatios=days.map(d=>data[d.key]?.quietRatio??null);
+  const maxVal=Math.max(...dailyTotals,10);
+  const weekTotal=dailyTotals.reduce((a,b)=>a+b,0);
+  const activeDays=dailyTotals.filter(v=>v>0).length;
+  const weekPomos=days.reduce((a,d)=>a+(data[d.key]?.pomos||0),0);
+  const ratioDays=dailyRatios.filter(r=>r!==null);
+  const avgRatio=ratioDays.length>0?Math.round(ratioDays.reduce((a,b)=>a+b,0)/ratioDays.length):null;
+  const barsEl=document.getElementById('day-bars');barsEl.innerHTML='';
+  days.forEach((d,i)=>{
+    const val=dailyTotals[i],ratio=dailyRatios[i],isToday=d.key===todayK;
+    const pct=Math.round((val/maxVal)*100);
+    const rColor=ratio===null?'var(--text-hint)':ratio>=75?'var(--accent-dark)':ratio>=50?'var(--amber)':'var(--red)';
+    const col=document.createElement('div');
+    col.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;';
+    col.innerHTML=`
+      <div style="font-size:10px;color:var(--text-sec);font-weight:500;">${val>0?val:''}</div>
       <div style="width:100%;display:flex;align-items:flex-end;height:90px;">
-        <div style="width:100%;height:${Math.max(4, pct)}%;border-radius:6px 6px 0 0;background:${val === 0 ? 'var(--bg-sec)' : isToday ? 'var(--accent-dark)' : 'var(--accent)'};transition:height .4s;"></div>
+        <div style="width:100%;height:${Math.max(4,pct)}%;border-radius:6px 6px 0 0;background:${val===0?'var(--bg-sec)':isToday?'var(--accent-dark)':'var(--accent)'};transition:height .4s;"></div>
       </div>
       <div style="font-size:10px;color:var(--text-hint);">${d.label}</div>
-      <div style="font-size:10px;font-weight:600;color:${rColor};">${ratio !== null ? ratio + '%' : ''}</div>`;
+      <div style="font-size:10px;font-weight:600;color:${rColor};">${ratio!==null?ratio+'%':''}</div>`;
     barsEl.appendChild(col);
   });
-
-  document.getElementById('week-stats').innerHTML = `
+  document.getElementById('week-stats').innerHTML=`
     <div class="week-stat"><div class="num">${weekTotal}</div><div class="lbl">Toplam soru</div></div>
     <div class="week-stat"><div class="num">${activeDays}</div><div class="lbl">Aktif gün</div></div>
     <div class="week-stat"><div class="num">${weekPomos}</div><div class="lbl">Tur</div></div>
-    <div class="week-stat"><div class="num" style="color:${avgRatio === null ? 'var(--text)' : avgRatio >= 75 ? 'var(--accent-dark)' : avgRatio >= 50 ? 'var(--amber)' : 'var(--red)'}">${avgRatio !== null ? avgRatio + '%' : '--'}</div><div class="lbl">Ort. Sessizlik</div></div>`;
-
-  // Ödül paneli
-  const REWARDS = [
-    {minRatio:0,  minSoru:0,   emoji:'🌱', title:'Başlangıç',      desc:'Henüz veri toplanıyor. Çalışmaya devam!',              color:'var(--bg-sec)'},
-    {minRatio:45, minSoru:30,  emoji:'🥉', title:'Bronz Hafta',    desc:'İyi başlangıç! Sessizlik oranını artırmayı dene.',      color:'#CD7F32'},
-    {minRatio:60, minSoru:60,  emoji:'🥈', title:'Gümüş Hafta',    desc:'Güzel! Odaklanma alışkanlığın gelişiyor.',             color:'#9EA8B3'},
-    {minRatio:75, minSoru:90,  emoji:'🥇', title:'Altın Hafta',    desc:'Muhteşem! Hem sessiz hem üretken bir hafta.',           color:'#F5C518'},
-    {minRatio:85, minSoru:100, emoji:'💎', title:'Elmas Hafta',    desc:'İnanılmaz konsantrasyon! Bunu hak ediyorsun.',          color:'#63D1F4'},
-    {minRatio:90, minSoru:120, emoji:'🏆', title:'Şampiyon Hafta', desc:'Tam hedef! %90+ sessizlik + tüm sorular. BRAVİ Duru!', color:'var(--accent-dark)'},
+    <div class="week-stat"><div class="num" style="color:${avgRatio===null?'var(--text)':avgRatio>=75?'var(--accent-dark)':avgRatio>=50?'var(--amber)':'var(--red)'}">${avgRatio!==null?avgRatio+'%':'--'}</div><div class="lbl">Ort. Sessizlik</div></div>`;
+  const REWARDS=[
+    {minRatio:0,  minSoru:0,   emoji:'🌱',title:'Başlangıç',     desc:'Henüz veri toplanıyor. Çalışmaya devam!',             color:'var(--bg-sec)'},
+    {minRatio:45, minSoru:30,  emoji:'🥉',title:'Bronz Hafta',   desc:'İyi başlangıç! Sessizlik oranını artırmayı dene.',    color:'#CD7F32'},
+    {minRatio:60, minSoru:60,  emoji:'🥈',title:'Gümüş Hafta',   desc:'Güzel! Odaklanma alışkanlığın gelişiyor.',           color:'#9EA8B3'},
+    {minRatio:75, minSoru:90,  emoji:'🥇',title:'Altın Hafta',   desc:'Muhteşem! Hem sessiz hem üretken bir hafta.',         color:'#F5C518'},
+    {minRatio:85, minSoru:100, emoji:'💎',title:'Elmas Hafta',   desc:'İnanılmaz konsantrasyon! Bunu hak ediyorsun.',        color:'#63D1F4'},
+    {minRatio:90, minSoru:120, emoji:'🏆',title:'Şampiyon Hafta',desc:'Tam hedef! %90+ sessizlik + tüm sorular. BRAVİ Duru!',color:'var(--accent-dark)'},
   ];
-  const effectiveRatio = avgRatio ?? 0;
-  let reward = REWARDS[0];
-  for (const r of REWARDS) { if (effectiveRatio >= r.minRatio && weekTotal >= r.minSoru) reward = r; }
-  const rc = document.getElementById('reward-card'), rcContent = document.getElementById('reward-content');
-  if (avgRatio !== null || weekTotal > 0) {
-    rc.style.display = 'block'; rc.style.borderColor = reward.color;
-    rcContent.innerHTML = `
+  const effectiveRatio=avgRatio??0;
+  let reward=REWARDS[0];
+  for(const r of REWARDS){if(effectiveRatio>=r.minRatio&&weekTotal>=r.minSoru)reward=r;}
+  const rc=document.getElementById('reward-card'),rcContent=document.getElementById('reward-content');
+  if(avgRatio!==null||weekTotal>0){
+    rc.style.display='block';rc.style.borderColor=reward.color;
+    rcContent.innerHTML=`
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
         <div style="font-size:40px;line-height:1;">${reward.emoji}</div>
         <div><div style="font-size:16px;font-weight:700;color:${reward.color};">${reward.title}</div>
           <div style="font-size:13px;color:var(--text-sec);margin-top:2px;">${reward.desc}</div></div>
       </div>
-      ${avgRatio !== null ? `<div style="margin-bottom:12px;">
+      ${avgRatio!==null?`<div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
           <span style="font-size:12px;color:var(--text-sec);">Haftalık Ort. Sessizlik</span>
           <span style="font-size:13px;font-weight:700;color:${avgRatio>=75?'var(--accent-dark)':avgRatio>=50?'var(--amber)':'var(--red)'};">${avgRatio}%</span>
         </div>
         <div style="height:8px;background:var(--bg-sec);border-radius:99px;overflow:hidden;">
           <div style="height:100%;width:${avgRatio}%;border-radius:99px;background:${avgRatio>=75?'var(--accent)':avgRatio>=50?'var(--amber)':'var(--red)'};transition:width .5s;"></div>
-        </div></div>` : ''}
+        </div></div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${REWARDS.slice(1).map(r => {
-          const achieved = effectiveRatio >= r.minRatio && weekTotal >= r.minSoru;
-          return `<div style="flex:1;min-width:70px;padding:8px 6px;border-radius:var(--radius-md);background:${achieved?r.color+'22':'var(--bg-sec)'};border:1px solid ${achieved?r.color:'var(--border)'};text-align:center;opacity:${achieved?1:0.45};">
+        ${REWARDS.slice(1).map(r=>{
+          const achieved=effectiveRatio>=r.minRatio&&weekTotal>=r.minSoru;
+          return`<div style="flex:1;min-width:70px;padding:8px 6px;border-radius:var(--radius-md);background:${achieved?r.color+'22':'var(--bg-sec)'};border:1px solid ${achieved?r.color:'var(--border)'};text-align:center;opacity:${achieved?1:0.45};">
             <div style="font-size:18px;">${r.emoji}</div>
             <div style="font-size:10px;font-weight:600;color:${achieved?r.color:'var(--text-hint)'};">${r.title}</div>
             <div style="font-size:10px;color:var(--text-hint);">%${r.minRatio}+ · ${r.minSoru}s</div></div>`;
         }).join('')}
       </div>`;
-  } else { rc.style.display = 'none'; }
-
-  // Derse göre
-  const swt = SUBJECTS.map((s, si) => days.reduce((a, d) => a + (data[d.key]?.subjects?.[si] || 0), 0));
-  const maxSubj = Math.max(...swt, 1);
-  document.getElementById('subject-week').innerHTML = SUBJECTS.map((s, i) => `
+  }else{rc.style.display='none';}
+  const swt=SUBJECTS.map((s,si)=>days.reduce((a,d)=>a+(data[d.key]?.subjects?.[si]||0),0));
+  const maxSubj=Math.max(...swt,1);
+  document.getElementById('subject-week').innerHTML=SUBJECTS.map((s,i)=>`
     <div class="subject-week-row">
       <div class="subject-week-name">${s.name}</div>
       <div class="subject-week-bar-wrap"><div class="subject-week-bar" style="width:${Math.round(swt[i]/maxSubj*100)}%;background:${s.color};"></div></div>
       <div class="subject-week-val">${swt[i]} soru</div>
     </div>`).join('');
-
-  // Geçmiş
-  const hl = document.getElementById('history-list');
-  const sortedDays = days.filter(d => data[d.key]).reverse();
-  if (!sortedDays.length) {
-    hl.innerHTML = '<div style="font-size:13px;color:var(--text-hint);padding:8px 0;">Bu haftaya ait kayıt yok.</div>';
+  const hl=document.getElementById('history-list');
+  const sortedDays=days.filter(d=>data[d.key]).reverse();
+  if(!sortedDays.length){
+    hl.innerHTML='<div style="font-size:13px;color:var(--text-hint);padding:8px 0;">Bu haftaya ait kayıt yok.</div>';
     return;
   }
-  hl.innerHTML = sortedDays.map(d => {
-    const rec = data[d.key];
-    const dateObj = new Date(d.key + 'T12:00:00');
-    const dateStr = pad(dateObj.getDate()) + '/' + pad(dateObj.getMonth()+1) + '/' + dateObj.getFullYear() + ' · ' + DAYS_TR[dateObj.getDay()];
-    const subjectStr = SUBJECTS.map((s, i) => rec.subjects[i] > 0 ? s.name + ': ' + rec.subjects[i] : '').filter(Boolean).join(', ') || '—';
-    const ratio = rec.quietRatio;
-    const rColor = ratio === undefined ? 'var(--text-sec)' : ratio >= 75 ? 'var(--accent-dark)' : ratio >= 50 ? 'var(--amber)' : 'var(--red)';
-    const rEmoji = ratio === undefined ? '' : ratio >= 90 ? '🏆' : ratio >= 75 ? '🥇' : ratio >= 60 ? '🥈' : ratio >= 45 ? '🥉' : '🌱';
-    const qMin   = rec.quietSec ? Math.floor(rec.quietSec / 60) + 'dk' : '';
-    return `<div class="history-day">
+  hl.innerHTML=sortedDays.map(d=>{
+    const rec=data[d.key];
+    const dateObj=new Date(d.key+'T12:00:00');
+    const dateStr=pad(dateObj.getDate())+'/'+pad(dateObj.getMonth()+1)+'/'+dateObj.getFullYear()+' · '+DAYS_TR[dateObj.getDay()];
+    const subjectStr=SUBJECTS.map((s,i)=>rec.subjects[i]>0?s.name+': '+rec.subjects[i]:'').filter(Boolean).join(', ')||'—';
+    const ratio=rec.quietRatio;
+    const rColor=ratio===undefined?'var(--text-sec)':ratio>=75?'var(--accent-dark)':ratio>=50?'var(--amber)':'var(--red)';
+    const rEmoji=ratio===undefined?'':ratio>=90?'🏆':ratio>=75?'🥇':ratio>=60?'🥈':ratio>=45?'🥉':'🌱';
+    const qMin=rec.quietSec?Math.floor(rec.quietSec/60)+'dk':'';
+    return`<div class="history-day">
       <div class="history-day-header">
         <span class="history-day-date">${dateStr}</span>
-        <span class="history-day-total">${rec.total} soru · ${rec.pomos || 0} tur</span>
+        <span class="history-day-total">${rec.total} soru · ${rec.pomos||0} tur</span>
       </div>
       <div class="history-day-subjects">${subjectStr}</div>
-      ${ratio !== undefined ? `<div class="history-day-stars" style="color:${rColor}">${rEmoji} Sessizlik: %${ratio} ${qMin ? '· 🔇 ' + qMin + ' sessiz' : ''}</div>` : ''}
+      ${ratio!==undefined?`<div class="history-day-stars" style="color:${rColor}">${rEmoji} Sessizlik: %${ratio} ${qMin?'· 🔇 '+qMin+' sessiz':''}</div>`:''}
     </div>`;
   }).join('');
 }
